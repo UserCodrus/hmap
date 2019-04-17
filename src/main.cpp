@@ -5,9 +5,8 @@
 
 #include <png.h>
 
-#include "heightmap.h"
+#include "generate.h"
 #include "export.h"
-#include "algorithm.h"
 
 using namespace std;
 
@@ -18,7 +17,7 @@ int main(int argc, char** argv)
 	unsigned height = 128;
 
 	// Default rng seed
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	unsigned seed = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
 
 	// Get the command line arguments
 	if (argc > 1)
@@ -99,20 +98,7 @@ int main(int argc, char** argv)
 
 	// Create the heightmap
 	Heightmap<uint16_t> map(width, height);
-
-	vector<int> p;
-	permutation(p, 32, seed);
-
-	for (unsigned y = 0; y < width; ++y)
-	{
-		for (unsigned x = 0; x < height; ++x)
-		{
-			float noise = (perlin(p, x / 128.0f + 1, y / 128.0f + 1) + 1.0f) * 0.5f;
-			//noise += (perlin(p, x / 64.0f + 1, y / 64.0f + 1) + 1.0f) * 0.25f;
-			//noise *= (perlin(p, x / 128.0f + 1, y / 128.0f + 1) + 1.0f) * 0.5f;
-			map.setData(x, y, noise * (uint16_t)U16::MAXIMUM);
-		}
-	}
+	layeredPerlin(map, seed, 16.0f, 3, 0x5555, 0xaaaa);
 
 	// Load height data into a byte buffer
 	PixelBuffer image(map.getWidthX(), map.getWidthY(), map.getSize());

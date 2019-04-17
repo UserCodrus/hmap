@@ -45,7 +45,7 @@ hdata Heightmap<typename hdata>::getData(unsigned x, unsigned y) const
 {
 	if (x >= width_x || y >= width_y)
 	{
-		throw new std::out_of_range("Array out of bounds in heightmap");
+		throw new std::exception("Array out of bounds in heightmap");
 	}
 
 	return data[y * width_x + x];
@@ -56,7 +56,7 @@ void Heightmap<typename hdata>::setData(unsigned x, unsigned y, hdata value)
 {
 	if (x >= width_x || y >= width_y)
 	{
-		throw new std::out_of_range("Array out of bounds in heightmap");
+		throw new std::exception("Array out of bounds in heightmap");
 	}
 
 	data[y * width_x + x] = value;
