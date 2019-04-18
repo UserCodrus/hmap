@@ -14,8 +14,8 @@ typedef std::chrono::steady_clock Timer;
 int main(int argc, char** argv)
 {
 	string fname = "heightmap.png";	// The filename the png will be saved to
-	unsigned width = 128;			// Heightmap width
-	unsigned height = 128;			// Heightmap height
+	unsigned width = 1024;			// Heightmap width
+	unsigned height = 1024;			// Heightmap height
 	
 	// Get the start time
 	auto t_start = Timer::now();
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 	// Create the heightmap
 	cout << "Generating heightmap... ";
 	Heightmap<uint16_t> map(width, height);
-	layeredPerlin(map, seed, 64.0f, 2, 0x0000, 0xFFFF);
+	layeredPerlin(map, seed, 64.0f, 1, 0x0000, 0xFFFF);
 
 	// Measure the time taken to create the heightmap
 	auto t_gen = Timer::now();

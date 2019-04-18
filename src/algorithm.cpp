@@ -17,18 +17,35 @@ float fade(float t)
 float grad(int hash, float x, float y)
 {
 	// Generate a gradient direction from one of eight directions based on
-	//  the four least significant digits of the hash number
+	//  the four least significant bits of the hash number
 
 	// If the 1st bit is a 1
 	if (hash & 8)
 	{
-		// Set x to zero if the 2nd bit is 0 or y if it is 1
-		x = hash & 4 ? x : 0;
-		y = hash & 4 ? 0 : y;
+		// Set y to zero if the 2nd bit is 1 or x if it is 0
+		if (hash & 4)
+		{
+			y = 0;
+		}
+		else
+		{
+			x = 0;
+		}
 	}
 
-	// Make y negative if the third bit is 0 and x negative if the fourth is 0
-	return ((hash & 1) ? x : -x) + ((hash & 2) ? y : -y);
+	// Make y negative if the third bit is 0
+	if (!(hash & 2))
+	{
+		y = -y;
+	}
+	// Make x negative if the fourth bit is 0
+	if (!(hash & 1))
+	{
+		x = -x;
+	}
+
+	// Add the two vectors to create a dot product
+	return x + y;
 }
 
 void permutation(std::vector<int>& p, unsigned size, unsigned seed)
