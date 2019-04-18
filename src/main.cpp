@@ -9,29 +9,32 @@
 #include "export.h"
 
 using namespace std;
+typedef std::chrono::steady_clock Timer;
 
 int main(int argc, char** argv)
 {
-	string fname = "heightmap.png";	// The default filename
-	unsigned width = 128;			// Heightmap dimensions
-	unsigned height = 128;
-
-	// Default rng seed
-	unsigned seed = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
+	string fname = "heightmap.png";	// The filename the png will be saved to
+	unsigned width = 128;			// Heightmap width
+	unsigned height = 128;			// Heightmap height
+	
+	// Get the start time
+	auto t_start = Timer::now();
+	// Generate the default rng seed
+	unsigned seed = (unsigned)t_start.time_since_epoch().count();
 
 	// Get the command line arguments
 	if (argc > 1)
 	{
 		int i = 1;
 
-		// Get the file name if the first argument is not a flag
+		// Get the file name from the first parameter if it is not a flag
 		if (argv[1][0] != '-' && argv[1][0] != '/')
 		{
 			fname = argv[1];
 			i++;
 		}
 
-		// Get flags from the command line
+		// Read other command line parameters
 		for (i; i < argc; ++i)
 		{
 			if (argv[i][0] == '-' || argv[i][0] == '/')
@@ -97,11 +100,17 @@ int main(int argc, char** argv)
 	}
 
 	// Create the heightmap
-	cout << "Generating heightmap...\n";
+	cout << "Generating heightmap... ";
 	Heightmap<uint16_t> map(width, height);
-	layeredPerlin(map, seed, 16.0f, 1, 0x0000, 0xFFFF);
+	layeredPerlin(map, seed, 64.0f, 2, 0x0000, 0xFFFF);
+
+	// Measure the time taken to create the heightmap
+	auto t_gen = Timer::now();
+	chrono::duration<double> delta = t_gen - t_start;
+	cout << delta.count() << "s\n";
 
 	// Load height data into a byte buffer
+	cout << "Exporting heightmap... ";
 	PixelBuffer image(map.getWidthX(), map.getWidthY(), map.getSize());
 	for (unsigned y = 0; y < map.getWidthY(); ++y)
 	{
@@ -112,12 +121,16 @@ int main(int argc, char** argv)
 	}
 
 	// Save the heightmap as a png
-	cout << "Exporting heightmap...\n";
 	try
 	{
 		image.save(fname);
 
-		cout << "Heightmap exported to " << fname << endl;
+		// Measure the time taken to package the heightmap
+		auto t_pack = Timer::now();
+		delta = t_pack - t_gen;
+		cout << delta.count() << "s\n";
+
+		cout << "Heightmap saved to " << fname << endl;
 	}
 	catch (exception& e)
 	{
