@@ -97,8 +97,9 @@ int main(int argc, char** argv)
 	}
 
 	// Create the heightmap
+	cout << "Generating heightmap...\n";
 	Heightmap<uint16_t> map(width, height);
-	layeredPerlin(map, seed, 16.0f, 3, 0x5555, 0xaaaa);
+	layeredPerlin(map, seed, 16.0f, 1, 0x0000, 0xFFFF);
 
 	// Load height data into a byte buffer
 	PixelBuffer image(map.getWidthX(), map.getWidthY(), map.getSize());
@@ -111,6 +112,7 @@ int main(int argc, char** argv)
 	}
 
 	// Save the heightmap as a png
+	cout << "Exporting heightmap...\n";
 	try
 	{
 		image.save(fname);
