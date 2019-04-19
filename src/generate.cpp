@@ -1,49 +1,36 @@
 #include "generate.h"
 #include "algorithm.h"
 
-void layeredPerlin(Heightmap<uint16_t>& map, unsigned seed, float frequency, unsigned octaves, uint16_t minimum, uint16_t maximum)
-{
-	const unsigned perms = 256;
-	uint16_t delta = maximum - minimum;
-
-	// Generate the permutations
-	std::vector<int> p;
-	permutation(p, perms, seed);
-
-	// Determine the frequency of the heightmap
-	if (frequency < 1.0f)
-	{
-		frequency = 1.0f;
-	}
-	float fx = (map.getWidthX() / perms + 2) * frequency;
-	float fy = (map.getWidthY() / perms + 2) * frequency;
-
-	for (unsigned y = 0; y < map.getWidthY(); ++y)
-	{
-		for (unsigned x = 0; x < map.getWidthX(); ++x)
-		{
-			float noise = 1.0f;
-			for (unsigned o = 1; o <= octaves; ++o)
-			{
-				//noise *= (perlin(p, x / (fx * o) + 1, y / (fy * o) + 1) + 1.0f) * 0.5f;
-			}
-			map.setHeight(x, y, (uint16_t)(noise * delta) + minimum);
-		}
-	}
-}
-
-void octavePerlin(Heightmap<uint16_t>& map, unsigned seed)
+void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned grid_size, unsigned octaves, float persistence)
 {
 	// Create the gradient grid
-	GradientGrid grad(256, 256, seed);
+	GradientGrid grad(grid_size, grid_size, seed);
 
 	// Apply noise
 	for (unsigned y = 0; y < map.getWidthY(); ++y)
 	{
 		for (unsigned x = 0; x < map.getWidthX(); ++x)
 		{
-			float noise = (perlin(grad, x / 64.0f + 1, y / 64.0f + 1) + 1.0f) * 0.5f;
-			map.setHeight(x, y, (uint16_t)(noise * 0xFFFF));
+			// Generate multiple layers of noise
+			float noise = 0.0f;
+			float amplitude = 1.0f;
+			float total_amplitude = 0.0f;
+
+			// Set the frequency so that the map coordinates will never be outside the grid
+			float fx = (1.0f / (float)pow(2, octaves - 1)) * ((float)(grid_size - 1) / (map.getWidthX() + 2));
+			float fy = (1.0f / (float)pow(2, octaves - 1)) * ((float)(grid_size - 1) / (map.getWidthY() + 2));
+			
+			for (unsigned o = 0; o < octaves; ++o)
+			{
+				noise += perlin(grad, (x + 1) * fx, (y + 1) * fy) * amplitude;
+				total_amplitude += amplitude;
+				amplitude *= persistence;
+				fx *= 2;
+				fy *= 2;
+			}
+
+			noise = (noise / total_amplitude + 1.0f) * 0.5f;
+			map.setHeight(x, y, (uint16_t)(noise * (max - min)) + min);
 		}
 	}
 }
