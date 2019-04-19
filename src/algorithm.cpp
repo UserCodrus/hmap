@@ -7,8 +7,6 @@
 
 constexpr float pi = 3.141592f;
 
-/// Math functions
-
 float lerp(float t, float a, float b)
 {
 	return a + t * (b - a);
@@ -18,8 +16,6 @@ float fade(float t)
 {
 	return t * t * t * (t * (t * 6 - 15) + 10);
 }
-
-/// Data structures
 
 GradientGrid::GradientGrid(unsigned _width, unsigned _height, unsigned seed)
 {
@@ -50,22 +46,10 @@ GradientGrid::~GradientGrid()
 	}
 }
 
-unsigned GradientGrid::getWidth() const
-{
-	return width;
-}
-
-unsigned GradientGrid::getHeight() const
-{
-	return height;
-}
-
 Vector2 GradientGrid::getGradient(unsigned x, unsigned y) const
 {
 	return gradient[y * width + x];
 }
-
-/// Noise algorithms
 
 void permutation(std::vector<int>& p, unsigned size, unsigned seed)
 {
@@ -84,8 +68,8 @@ void permutation(std::vector<int>& p, unsigned size, unsigned seed)
 // A hashed gradient function for perlin noise
 float grad(int hash, float x, float y)
 {
-	// Produce a gradient vector based on the last four bits of the hash
-	switch (hash & 0x7)
+	// Produce a gradient vector based on the last two bits of the hash
+	switch (hash & 0x3)
 	{
 	case 0x0:
 		return x + y;
@@ -95,14 +79,6 @@ float grad(int hash, float x, float y)
 		return x - y;
 	case 0x3:
 		return -x - y;
-	case 0x4:
-		return x;
-	case 0x5:
-		return -x;
-	case 0x6:
-		return y;
-	case 0x7:
-		return -y;
 	}
 
 	return 0;
@@ -133,14 +109,11 @@ float perlin(const int* p, float x, float y)
 
 float perlin(const GradientGrid& g, float x, float y)
 {
-	// Get to coordinates of the grid cell containing x, y
-	int X, Y, X1, Y1;
-	X = (int)x;
-	Y = (int)y;
-	X1 = X + 1;
-	Y1 = Y + 1;
+	// Get the coordinates of the grid cell containing x, y
+	int X = (int)x;
+	int Y = (int)y;
 
-	// Subtract the unit coordinates of x and y to get their fractional portion
+	// Subtract the cell coordinates from x and y to get their fractional portion
 	x -= X;
 	y -= Y;
 
@@ -149,42 +122,13 @@ float perlin(const GradientGrid& g, float x, float y)
 	float v = fade(y);
 
 	// Get the gradients at the corner of the unit cell
-	Vector2 g00 = g.getGradient(X, Y);
-	Vector2 g01 = g.getGradient(X, Y1);
-	Vector2 g10 = g.getGradient(X1, Y);
-	Vector2 g11 = g.getGradient(X1, Y1);
+	Vector2 g00 = g.gradient[Y * g.width + X];
+	Vector2 g01 = g.gradient[(Y + 1) * g.width + X];
+	Vector2 g10 = g.gradient[Y * g.width + X + 1];
+	Vector2 g11 = g.gradient[(Y + 1) * g.width + X + 1];
 
 	return lerp(u,
 		lerp(v, g00.x * x + g00.y * y, g01.x * x + g01.y * (y - 1)),
 		lerp(v, g10.x * (x - 1) + g10.y * y, g11.x * (x - 1) + g11.y * (y - 1))
-	);
-}
-
-float perlinT(const GradientGrid& g, float x, float y)
-{
-	int X, Y, X1, Y1;
-
-	// Floor the coordinates to get the grid cell containing x and y
-	X = (int)x;
-	Y = (int)y;
-
-	// Subtract the unit coordinates of x and y to get their fractional portion
-	x -= X;
-	y -= Y;
-
-	// Wrap the grid coordinates and get the coordinates for the opposite corner
-	X = X % g.getWidth();
-	Y = Y % g.getHeight();
-	X1 = (X + 1) % g.getWidth();
-	Y1 = (Y + 1) % g.getHeight();
-
-	// Get the fade curves of the coordinates
-	float u = fade(x);
-	float v = fade(y);
-
-	// Interpolate the dot products of the gradients
-	return lerp(u,
-		lerp(v, g.getGradient(X, Y).x * x + g.getGradient(X, Y).y * y, g.getGradient(X, Y1).x * x + g.getGradient(X, Y1).y * (y - 1)),
-		lerp(v, g.getGradient(X1, Y).x * (x - 1) + g.getGradient(X1, Y).y * y, g.getGradient(X1, Y1).x * (x - 1) + g.getGradient(X1, Y1).y * (y - 1))
 	);
 }

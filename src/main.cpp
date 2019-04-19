@@ -103,11 +103,8 @@ int main(int argc, char** argv)
 	cout << "Generating heightmap... ";
 	Heightmap<uint16_t> map(width, height);
 	//layeredPerlin(map, seed, 16.0f, 1, 0x0000, 0xFFFF);
-	for (unsigned i = 0; i < 1; ++i)
-	{
-		octavePerlinF(map, seed);
-		++seed;
-	}
+	octavePerlin(map, seed);
+
 
 	// Measure the time taken to create the heightmap
 	auto t_gen = Timer::now();
