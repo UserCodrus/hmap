@@ -11,3 +11,6 @@
 //	minimum =	The minimum elevation of the heightmap
 //	maximum =	The maximum elevation of the heightmap
 void layeredPerlin(Heightmap<uint16_t>& map, unsigned seed, float frequency, unsigned octaves, uint16_t minimum, uint16_t maximum);
+
+void octavePerlin(Heightmap<uint16_t>& map, unsigned seed);
+void octavePerlinF(Heightmap<uint16_t>& map, unsigned seed);

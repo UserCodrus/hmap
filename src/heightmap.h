@@ -12,9 +12,9 @@ public:
 	unsigned getWidthX() const;
 	unsigned getWidthY() const;
 	unsigned getSize() const;
-	hdata getData(unsigned x, unsigned y) const;
+	hdata getHeight(unsigned x, unsigned y) const;
 
-	void setData(unsigned x, unsigned y, hdata value);
+	void setHeight(unsigned x, unsigned y, hdata value);
 
 private:
 	hdata* data = nullptr;

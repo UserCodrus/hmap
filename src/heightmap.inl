@@ -41,7 +41,7 @@ unsigned Heightmap<typename hdata>::getSize() const
 }
 
 template <typename hdata>
-hdata Heightmap<typename hdata>::getData(unsigned x, unsigned y) const
+hdata Heightmap<typename hdata>::getHeight(unsigned x, unsigned y) const
 {
 	if (x >= width_x || y >= width_y)
 	{
@@ -52,7 +52,7 @@ hdata Heightmap<typename hdata>::getData(unsigned x, unsigned y) const
 }
 
 template <typename hdata>
-void Heightmap<typename hdata>::setData(unsigned x, unsigned y, hdata value)
+void Heightmap<typename hdata>::setHeight(unsigned x, unsigned y, hdata value)
 {
 	if (x >= width_x || y >= width_y)
 	{

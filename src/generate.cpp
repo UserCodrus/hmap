@@ -25,9 +25,42 @@ void layeredPerlin(Heightmap<uint16_t>& map, unsigned seed, float frequency, uns
 			float noise = 1.0f;
 			for (unsigned o = 1; o <= octaves; ++o)
 			{
-				noise *= (perlin(p, x / (fx * o) + 1, y / (fy * o) + 1) + 1.0f) * 0.5f;
+				//noise *= (perlin(p, x / (fx * o) + 1, y / (fy * o) + 1) + 1.0f) * 0.5f;
 			}
-			map.setData(x, y, (uint16_t)(noise * delta) + maximum);
+			map.setHeight(x, y, (uint16_t)(noise * delta) + minimum);
+		}
+	}
+}
+
+void octavePerlin(Heightmap<uint16_t>& map, unsigned seed)
+{
+	// Create the gradient grid
+	GradientGrid grad(256, 256, seed);
+
+	// Apply noise
+	for (unsigned y = 0; y < map.getWidthY(); ++y)
+	{
+		for (unsigned x = 0; x < map.getWidthX(); ++x)
+		{
+			float noise = (perlin(grad, x / 64.0f + 1, y / 64.0f + 1) + 1.0f) * 0.5f;
+			map.setHeight(x, y, (uint16_t)(noise * 0xFFFF));
+		}
+	}
+}
+
+void octavePerlinF(Heightmap<uint16_t>& map, unsigned seed)
+{
+	// Create the gradient grid
+	std::vector<int> p;
+	permutation(p, 256, seed);
+
+	// Apply noise
+	for (unsigned y = 0; y < map.getWidthY(); ++y)
+	{
+		for (unsigned x = 0; x < map.getWidthX(); ++x)
+		{
+			float noise = (perlin(p.data(), x / 64.0f + 1, y / 64.0f + 1) + 1.0f) * 0.5f;
+			map.setHeight(x, y, (uint16_t)(noise * 0xFFFF));
 		}
 	}
 }

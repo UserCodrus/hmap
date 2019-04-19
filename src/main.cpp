@@ -102,7 +102,12 @@ int main(int argc, char** argv)
 	// Create the heightmap
 	cout << "Generating heightmap... ";
 	Heightmap<uint16_t> map(width, height);
-	layeredPerlin(map, seed, 64.0f, 1, 0x0000, 0xFFFF);
+	//layeredPerlin(map, seed, 16.0f, 1, 0x0000, 0xFFFF);
+	for (unsigned i = 0; i < 1; ++i)
+	{
+		octavePerlinF(map, seed);
+		++seed;
+	}
 
 	// Measure the time taken to create the heightmap
 	auto t_gen = Timer::now();
@@ -116,7 +121,7 @@ int main(int argc, char** argv)
 	{
 		for (unsigned x = 0; x < map.getWidthX(); ++x)
 		{
-			image.fillPixel(x, y, map.getData(x, y));
+			image.fillPixel(x, y, map.getHeight(x, y));
 		}
 	}
 
