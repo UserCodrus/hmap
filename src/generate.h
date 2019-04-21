@@ -16,7 +16,7 @@
 void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned grid_size, unsigned octaves, float persistence);
 
 /*
- * Generate a heightmap using three layers of Perlin noise, similar to early versions of Minecraft
+ * Generate a heightmap using three layers of Perlin noise
  *
  * min:			The minimum elevation of the heightmap produced
  * max:			The maximum elevation of the heightmap produced
@@ -26,4 +26,4 @@ void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigne
  * detail:		Affects the minor details of the terrain - low details means smooth hills, while higher details means bumpy terrain (must be between 0.0 and 1.0)
  *
  */
-void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned grid_size, float roughness, float detail);
+void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned frequency, unsigned detail_frequency, float detail_level);

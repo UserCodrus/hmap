@@ -55,52 +55,51 @@ void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigne
 	}
 }
 
-void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned grid_size, float roughness, float detail)
+void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned frequency_base, unsigned frequency_detail, float detail_level)
 {
+	// Check input values
+	if (frequency_base < 1)
+	{
+		frequency_base = 1;
+	}
+	if (frequency_detail < 1)
+	{
+		frequency_detail = 1;
+	}
+	if (detail_level < 0.0f)
+	{
+		detail_level = 0.0f;
+	}
+	else if (detail_level > 1.0f)
+	{
+		detail_level = 1.0f;
+	}
+	
 	// Create the gradient grid
-	GradientGrid grad1(grid_size, grid_size, seed);
-	GradientGrid grad2(grid_size, grid_size, seed);
-	GradientGrid grad3(grid_size, grid_size, seed);
+	GradientGrid base(frequency_base + 1, frequency_base + 1, seed);
+	GradientGrid mod(frequency_detail + 1, frequency_detail + 1, ++seed);
 	unsigned width = map.getWidthX();
 	unsigned height = map.getWidthY();
 
-	// Check input values
-	if (grid_size < 2)
-	{
-		grid_size = 2;
-	}
-	if (detail < 0.0f)
-	{
-		detail = 0.0f;
-	}
-	else if (detail > 1.0f)
-	{
-		detail = 1.0f;
-	}
-	if (roughness < 0.0f)
-	{
-		roughness = 0.0f;
-	}
-	else if (roughness > 1.0f)
-	{
-		roughness = 1.0f;
-	}
+	// Reduce the frequency of the noise a little so heightmap coordinates stay inside the grid
+	float fx_base = (float)(base.width - 1) / (width + 2);
+	float fy_base = (float)(base.height - 1) / (height + 2);
+	float fx_mod = (float)(mod.width - 1) / (width + 2);
+	float fy_mod = (float)(mod.height - 1) / (height + 2);
 
-	// Set the frequency of the heightmaps to avoid going outside of the gradient grid
-	float fx = (float)(grid_size - 1) / (width + 2);
-	float fy = (float)(grid_size - 1) / (height + 2);
+	// Calculate the value needed to normalize the noise
+	float normalize = 0.5f / (1.0f + detail_level);
 
 	// Apply noise
-	float elevation, rough, details;
+	float elevation, detail;
 	for (unsigned y = 0; y < height; ++y)
 	{
 		for (unsigned x = 0; x < width; ++x)
 		{
-			elevation = perlin(grad1, (x + 1) * roughness * fx, (y + 1) * roughness * fy);
-			rough = perlin(grad2, (x + 1) * roughness * fx, (y + 1) * roughness * fy);
-			details = perlin(grad3, (x + 1) * fx, (y + 1) * fy);
+			elevation = perlin(base, (x + 1) * fx_base, (y + 1) * fy_base);
+			detail = perlin(mod, (x + 1) * fx_mod, (y + 1) * fy_mod);
 
-			map.setHeight(x, y, (uint16_t)(((elevation + rough * details * detail) / 4.0f + 0.5f) * (max - min)) + min);
+			map.setHeight(x, y, (uint16_t)(((elevation + elevation * detail * detail_level) * normalize + 0.5f) * (max - min)) + min);
 		}
 	}
 }
