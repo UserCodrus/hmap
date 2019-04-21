@@ -1,7 +1,9 @@
 #include "generate.h"
 #include "algorithm.h"
 
-void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned grid_size, unsigned octaves, float persistence)
+#include <limits>
+
+void perlinOctaves(Heightmap& map, unsigned seed, float min, float max, unsigned grid_size, unsigned octaves, float persistence)
 {
 	// Create the gradient grid
 	GradientGrid grad(grid_size, grid_size, seed);
@@ -25,6 +27,10 @@ void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigne
 	{
 		persistence = 1.0f;
 	}
+
+	// Get the limits of the heightmap
+	float bottom = min * std::numeric_limits<hdata>::max();
+	float delta = (max - min) * std::numeric_limits<hdata>::max();
 
 	// Apply noise
 	for (unsigned y = 0; y < height; ++y)
@@ -50,12 +56,12 @@ void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigne
 			}
 
 			noise = (noise / total_amplitude + 1.0f) * 0.5f;
-			map.setHeight(x, y, (uint16_t)(noise * (max - min)) + min);
+			map.setHeight(x, y, (hdata)(noise * delta + bottom));
 		}
 	}
 }
 
-void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned base_frequency, unsigned detail_frequency, float detail_level)
+void perlinNotch(Heightmap& map, unsigned seed, float min, float max, unsigned base_frequency, unsigned detail_frequency, float detail_level)
 {
 	// Check input values
 	if (base_frequency < 1)
@@ -90,6 +96,10 @@ void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned 
 	// Calculate the value needed to normalize the noise
 	float normalize = 0.5f / (1.0f + detail_level);
 
+	// Get the limits of the heightmap
+	float bottom = min * std::numeric_limits<hdata>::max();
+	float delta = (max - min) * std::numeric_limits<hdata>::max();
+
 	// Apply noise
 	float elevation, detail;
 	for (unsigned y = 0; y < height; ++y)
@@ -99,12 +109,12 @@ void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned 
 			elevation = perlin(base, (x + 1) * fx_base, (y + 1) * fy_base);
 			detail = perlin(mod, (x + 1) * fx_mod, (y + 1) * fy_mod);
 
-			map.setHeight(x, y, (uint16_t)(((elevation + elevation * detail * detail_level) * normalize + 0.5f) * (max - min)) + min);
+			map.setHeight(x, y, (hdata)(((elevation + elevation * detail * detail_level) * normalize + 0.5f) * delta + bottom));
 		}
 	}
 }
 
-void testperlin(Heightmap<uint16_t>& map, unsigned seed)
+void testperlin(Heightmap& map, unsigned seed)
 {
 	// Create the gradient grid
 	std::vector<int> p;

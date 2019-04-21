@@ -2,7 +2,8 @@
 
 #include <string>
 
-template <typename hdata>
+typedef uint16_t hdata;
+
 class Heightmap
 {
 public:
@@ -21,5 +22,3 @@ private:
 	unsigned width_x;
 	unsigned width_y;
 };
-
-#include "heightmap.inl"

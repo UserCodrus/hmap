@@ -13,7 +13,7 @@
  * persistence:	The level of influence each successive octave has - higher persistence results in bumpier terrain, while lower persistence creates smooth hills (must be between 0.0 and 1.0)
  * 
  */
-void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned grid_size, unsigned octaves, float persistence);
+void perlinOctaves(Heightmap& map, unsigned seed, float min, float max, unsigned grid_size, unsigned octaves, float persistence);
 
 /*
  * Generate a heightmap using three layers of Perlin noise
@@ -26,4 +26,4 @@ void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigne
  * detail_level:		Affects the strength of the roughness - low detail means smooth, tall hills, while higher details means bumpy terrain (must be between 0.0 and 1.0)
  *
  */
-void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned base_frequency, unsigned detail_frequency, float detail_level);
+void perlinNotch(Heightmap& map, unsigned seed, float min, float max, unsigned base_frequency, unsigned detail_frequency, float detail_level);
