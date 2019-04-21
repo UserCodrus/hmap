@@ -103,7 +103,7 @@ int main(int argc, char** argv)
 	cout << "Generating heightmap... ";
 	Heightmap<uint16_t> map(width, height);
 	//perlinOctaves(map, 0x5555, 0xDDDD, seed, 16, 4, 0.6f);
-	perlinNotch(map, 0x3333, 0xDDDD, seed, 3, 20, 0.5f);
+	perlinNotch(map, 0x3333, 0xDDDD, seed, 3, 12, 0.6f);
 
 	// Measure the time taken to create the heightmap
 	auto t_gen = Timer::now();

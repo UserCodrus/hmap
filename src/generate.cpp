@@ -55,16 +55,16 @@ void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigne
 	}
 }
 
-void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned frequency_base, unsigned frequency_detail, float detail_level)
+void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned base_frequency, unsigned detail_frequency, float detail_level)
 {
 	// Check input values
-	if (frequency_base < 1)
+	if (base_frequency < 1)
 	{
-		frequency_base = 1;
+		base_frequency = 1;
 	}
-	if (frequency_detail < 1)
+	if (detail_frequency < 1)
 	{
-		frequency_detail = 1;
+		detail_frequency = 1;
 	}
 	if (detail_level < 0.0f)
 	{
@@ -76,8 +76,8 @@ void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned 
 	}
 	
 	// Create the gradient grid
-	GradientGrid base(frequency_base + 1, frequency_base + 1, seed);
-	GradientGrid mod(frequency_detail + 1, frequency_detail + 1, ++seed);
+	GradientGrid base(base_frequency + 1, base_frequency + 1, seed);
+	GradientGrid mod(detail_frequency + 1, detail_frequency + 1, ++seed);
 	unsigned width = map.getWidthX();
 	unsigned height = map.getWidthY();
 

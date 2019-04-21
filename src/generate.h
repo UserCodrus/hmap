@@ -18,12 +18,12 @@ void perlinOctaves(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigne
 /*
  * Generate a heightmap using three layers of Perlin noise
  *
- * min:			The minimum elevation of the heightmap produced
- * max:			The maximum elevation of the heightmap produced
- * seed:		The rng seed to use for noise generation
- * grid_size:	The size of the gradient grid used for noise generation - smaller grids mean smoother noise, while larger grids will be granier with steep elevation changes (must be > 2)
- * roughness:	Affects the roughness of the terrain - low roughness produces hilly terrain, and high roughness produces more mountainous terrain (must be between 0.0 and 1.0)
- * detail:		Affects the minor details of the terrain - low details means smooth hills, while higher details means bumpy terrain (must be between 0.0 and 1.0)
+ * min:					The minimum elevation of the heightmap produced
+ * max:					The maximum elevation of the heightmap produced
+ * seed:				The rng seed to use for noise generation
+ * base_frequency:		The frequency of the base noise - smaller frequency mean smoother terrain, while higher frequency will have steep hills (must be > 0)
+ * detail_frequency:	Affects the roughness of the terrain - low roughness produces smoother hills, and high roughness produces more bumpy, mountainous terrain (must be > 0)
+ * detail_level:		Affects the strength of the roughness - low detail means smooth, tall hills, while higher details means bumpy terrain (must be between 0.0 and 1.0)
  *
  */
-void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned frequency, unsigned detail_frequency, float detail_level);
+void perlinNotch(Heightmap<uint16_t>& map, uint16_t min, uint16_t max, unsigned seed, unsigned base_frequency, unsigned detail_frequency, float detail_level);
