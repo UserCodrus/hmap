@@ -48,7 +48,7 @@ void perlinOctaves(Heightmap& map, unsigned seed, float min, float max, unsigned
 			
 			for (unsigned o = 0; o < octaves; ++o)
 			{
-				noise += perlin(grad, (x + 1) * fx, (y + 1) * fy) * amplitude;
+				noise += grad.perlin((x + 1) * fx, (y + 1) * fy) * amplitude;
 				total_amplitude += amplitude;
 				amplitude *= persistence;
 				fx *= 2;
@@ -88,10 +88,10 @@ void perlinNotch(Heightmap& map, unsigned seed, float min, float max, unsigned b
 	unsigned height = map.getWidthY();
 
 	// Reduce the frequency of the noise a little so heightmap coordinates stay inside the grid
-	float fx_base = (float)(base.width - 1) / (width + 2);
-	float fy_base = (float)(base.height - 1) / (height + 2);
-	float fx_mod = (float)(mod.width - 1) / (width + 2);
-	float fy_mod = (float)(mod.height - 1) / (height + 2);
+	float fx_base = (float)(base.getWidth() - 1) / (width + 2);
+	float fy_base = (float)(base.getHeight() - 1) / (height + 2);
+	float fx_mod = (float)(mod.getWidth() - 1) / (width + 2);
+	float fy_mod = (float)(mod.getHeight() - 1) / (height + 2);
 
 	// Calculate the value needed to normalize the noise
 	float normalize = 0.5f / (1.0f + detail_level);
@@ -106,8 +106,8 @@ void perlinNotch(Heightmap& map, unsigned seed, float min, float max, unsigned b
 	{
 		for (unsigned x = 0; x < width; ++x)
 		{
-			elevation = perlin(base, (x + 1) * fx_base, (y + 1) * fy_base);
-			detail = perlin(mod, (x + 1) * fx_mod, (y + 1) * fy_mod);
+			elevation = base.perlin((x + 1) * fx_base, (y + 1) * fy_base);
+			detail = mod.perlin((x + 1) * fx_mod, (y + 1) * fy_mod);
 
 			map.setHeight(x, y, (hdata)(((elevation + elevation * detail * detail_level) * normalize + 0.5f) * delta + bottom));
 		}

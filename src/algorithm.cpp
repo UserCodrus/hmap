@@ -51,6 +51,42 @@ Vector2 GradientGrid::getGradient(unsigned x, unsigned y) const
 	return gradient[y * width + x];
 }
 
+unsigned GradientGrid::getWidth()
+{
+	return width;
+}
+
+unsigned GradientGrid::getHeight()
+{
+	return height;
+}
+
+float GradientGrid::perlin(float x, float y) const
+{
+	// Get the coordinates of the grid cell containing x, y
+	int X = (int)x;
+	int Y = (int)y;
+
+	// Subtract the cell coordinates from x and y to get their fractional portion
+	x -= X;
+	y -= Y;
+
+	// Get the fade curves of the coordinates
+	float u = fade(x);
+	float v = fade(y);
+
+	// Get the gradients at the corner of the unit cell
+	Vector2 g00 = gradient[Y * width + X];
+	Vector2 g01 = gradient[(Y + 1) * width + X];
+	Vector2 g10 = gradient[Y * width + X + 1];
+	Vector2 g11 = gradient[(Y + 1) * width + X + 1];
+
+	return lerp(u,
+		lerp(v, g00.x * x + g00.y * y, g01.x * x + g01.y * (y - 1)),
+		lerp(v, g10.x * (x - 1) + g10.y * y, g11.x * (x - 1) + g11.y * (y - 1))
+	);
+}
+
 void permutation(std::vector<int>& p, unsigned size, unsigned seed)
 {
 	// Fill the vector with sequential integers
@@ -104,31 +140,5 @@ float perlin(const int* p, float x, float y)
 	return lerp(u,
 		lerp(v, grad(p[X + p[Y]], x, y),		grad(p[X + p[Y1]], x, y - 1)),
 		lerp(v, grad(p[X1 + p[Y]], x - 1, y),	grad(p[X1 + p[Y1]], x - 1, y - 1))
-	);
-}
-
-float perlin(const GradientGrid& g, float x, float y)
-{
-	// Get the coordinates of the grid cell containing x, y
-	int X = (int)x;
-	int Y = (int)y;
-
-	// Subtract the cell coordinates from x and y to get their fractional portion
-	x -= X;
-	y -= Y;
-
-	// Get the fade curves of the coordinates
-	float u = fade(x);
-	float v = fade(y);
-
-	// Get the gradients at the corner of the unit cell
-	Vector2 g00 = g.gradient[Y * g.width + X];
-	Vector2 g01 = g.gradient[(Y + 1) * g.width + X];
-	Vector2 g10 = g.gradient[Y * g.width + X + 1];
-	Vector2 g11 = g.gradient[(Y + 1) * g.width + X + 1];
-
-	return lerp(u,
-		lerp(v, g00.x * x + g00.y * y, g01.x * x + g01.y * (y - 1)),
-		lerp(v, g10.x * (x - 1) + g10.y * y, g11.x * (x - 1) + g11.y * (y - 1))
 	);
 }

@@ -4,7 +4,7 @@
 
 // Linear interpolation
 inline float lerp(float t, float a, float b);
-// Perlin fade
+// Perlin smoothstep function
 inline float fade(float t);
 
 struct Vector2
@@ -14,13 +14,21 @@ struct Vector2
 };
 
 // A gradient grid filled with random unit vectors
+// Used to generate Perlin noise and simplex noise
 struct GradientGrid
 {
+public:
 	GradientGrid(unsigned _width, unsigned _height, unsigned seed);
 	~GradientGrid();
 
 	Vector2 getGradient(unsigned x, unsigned y) const;
+	unsigned getWidth();
+	unsigned getHeight();
 
+	// Get Perlin noise at the specified coordinate
+	float perlin(float x, float y) const;
+
+private:
 	unsigned width;
 	unsigned height;
 	Vector2* gradient = nullptr;
@@ -31,5 +39,3 @@ void permutation(std::vector<int>& p, unsigned size, unsigned seed);
 
 // Classic Perlin noise function with hashed gradients
 float perlin(const int* p, float x, float y);
-// Perlin noise function with a gradient grid
-float perlin(const GradientGrid& g, float x, float y);
