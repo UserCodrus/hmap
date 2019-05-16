@@ -3,6 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Unreal files
+Binaries/
+Content/
+Intermediate/
+Resources/
+
 # Misc files
 *.png
 
