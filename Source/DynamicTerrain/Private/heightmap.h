@@ -7,8 +7,12 @@ typedef uint16_t hdata;
 class Heightmap
 {
 public:
+	Heightmap();
 	Heightmap(unsigned size_x, unsigned size_y);
 	~Heightmap();
+
+	// Reallocate the internal array
+	void resize(unsigned x, unsigned y);
 
 	unsigned getWidthX() const;
 	unsigned getWidthY() const;
@@ -44,7 +48,7 @@ public:
 	void perlinNotch(unsigned seed, float min, float max, unsigned base_frequency, unsigned detail_frequency, float detail_level);
 
 private:
-	hdata* data = nullptr;
+	hdata* data;
 	unsigned width_x;
 	unsigned width_y;
 };
