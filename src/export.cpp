@@ -1,8 +1,8 @@
+#include "export.h"
+
 #include <stdexcept>
 #include <cstdio>
 #include <png.h>
-
-#include "export.h"
 
 PixelBuffer::PixelBuffer(unsigned _width, unsigned _height, unsigned _size)
 {

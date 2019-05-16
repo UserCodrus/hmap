@@ -1,9 +1,9 @@
+#include "algorithm.h"
+
 #include <random>
 #include <numeric>
 #include <stdexcept>
 #include <math.h>
-
-#include "algorithm.h"
 
 constexpr float pi = 3.141592f;
 

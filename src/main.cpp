@@ -1,12 +1,12 @@
+#include "heightmap.h"
+#include "export.h"
+
 #include <iostream>
 #include <string>
 #include <random>
 #include <chrono>
 
 #include <png.h>
-
-#include "heightmap.h"
-#include "export.h"
 
 using namespace std;
 typedef std::chrono::steady_clock Timer;
