@@ -114,19 +114,25 @@ void Heightmap::perlinNotch(unsigned seed, float min, float max, unsigned base_f
 	}
 }
 
-void testperlin(Heightmap& map, unsigned seed)
+void Heightmap::random(unsigned seed, float min, float max, unsigned frequency)
 {
-	// Create the gradient grid
-	std::vector<int> p;
-	permutation(p, 256, seed);
+	// Generate noise
+	ValueGrid grid(frequency, frequency, seed);
+
+	// Add frequency constants so the heightmap coordinates stay in the grid
+	float fx = (float)(grid.getWidth() - 1) / width_x;
+	float fy = (float)(grid.getHeight() - 1) / width_y;
+
+	// Get the limits of the heightmap
+	float bottom = min * std::numeric_limits<hdata>::max();
+	float delta = (max - min) * std::numeric_limits<hdata>::max();
 
 	// Apply noise
-	for (unsigned y = 0; y < map.getWidthY(); ++y)
+	for (unsigned y = 0; y < width_y; ++y)
 	{
-		for (unsigned x = 0; x < map.getWidthX(); ++x)
+		for (unsigned x = 0; x < width_x; ++x)
 		{
-			float noise = (perlin(p.data(), x / 64.0f + 1, y / 64.0f + 1) + 1.0f) * 0.5f;
-			map.setHeight(x, y, (uint16_t)(noise * 0xFFFF));
+			setHeight(x, y, (hdata)(grid.noise(x * fx, y * fy) * delta + bottom));
 		}
 	}
 }

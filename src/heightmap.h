@@ -47,6 +47,18 @@ public:
 	 */
 	void perlinNotch(unsigned seed, float min, float max, unsigned base_frequency, unsigned detail_frequency, float detail_level);
 
+	/*
+	 * Generate a heightmap using three layers of Perlin noise
+	 *
+	 *
+	 * seed:		The rng seed to use for noise generation
+	 * min:			The minimum elevation of the heightmap produced
+	 * max:			The maximum elevation of the heightmap produced
+	 * frequency:	The frequency of the noise produced - higher frequency means granier noise
+	 *
+	 */
+	void random(unsigned seed, float min, float max, unsigned frequency);
+
 private:
 	hdata* data;
 	unsigned width_x;

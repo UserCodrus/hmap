@@ -15,7 +15,7 @@ struct Vector2
 
 // A gradient grid filled with random unit vectors
 // Used to generate Perlin noise and simplex noise
-struct GradientGrid
+class GradientGrid
 {
 public:
 	GradientGrid(unsigned _width, unsigned _height, unsigned seed);
@@ -32,6 +32,30 @@ private:
 	unsigned width;
 	unsigned height;
 	Vector2* gradient = nullptr;
+};
+
+// A value grid with random values at each point
+// Used to generate value noise and diamond square noise
+class ValueGrid
+{
+public:
+	// Constructor for value noise
+	ValueGrid(unsigned _width, unsigned _height, unsigned seed);
+	// Constructor for diamond square noise
+	ValueGrid(unsigned size, unsigned seed);
+	~ValueGrid();
+
+	float getValue(unsigned x, unsigned y) const;
+	unsigned getWidth();
+	unsigned getHeight();
+
+	// Get interpolated noise
+	float noise(float x, float y) const;
+
+private:
+	unsigned width;
+	unsigned height;
+	float* value = nullptr;
 };
 
 // Generate a set of permutations for hashed perlin noise gradients
