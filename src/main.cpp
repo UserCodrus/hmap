@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 	//perlinOctaves(map, seed, 0.33f, 0.66f, 16, 4, 0.6f);
 	//map.perlinNotch(seed, 0.36f, 0.66f, 3, 12, 0.6f);
 	//map.random(seed, 0.0f, 1.0f, 1024);
-	map.diamondSquare(seed, 0.0f, 1.0f, 8, 0.5f);
+	map.diamondSquare(seed, 0.0f, 1.0f, 8);
 
 	// Measure the time taken to create the heightmap
 	auto t_gen = Timer::now();

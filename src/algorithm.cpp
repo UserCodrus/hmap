@@ -140,7 +140,7 @@ ValueGrid::ValueGrid(unsigned _width, unsigned _height, unsigned seed)
 	}
 }
 
-ValueGrid::ValueGrid(unsigned size, float decay, unsigned seed)
+ValueGrid::ValueGrid(unsigned size, unsigned seed)
 {
 	width = (unsigned)pow(2, size) + 1;
 	height = width;
@@ -149,18 +149,8 @@ ValueGrid::ValueGrid(unsigned size, float decay, unsigned seed)
 	std::default_random_engine rando(seed);
 	std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
 
-	if (decay > 1.0f)
-	{
-		decay = 1.0f;
-	}
-	else if (decay < 0.0f)
-	{
-		decay = 0.0f;
-	}
-
 	// The range of the random values generated
-	// Equal to decay ^ x where x is the current permutation
-	float range = 0.5f;
+	float range = 0.5;
 
 	// Generate corner values
 	value[0] = dist(rando) * range;
@@ -177,7 +167,7 @@ ValueGrid::ValueGrid(unsigned size, float decay, unsigned seed)
 	// Diamond-square algorithm
 	while (stride > 1)
 	{
-		range *= 0.5f;
+		range *= 0.5;
 		unsigned half = stride / 2;
 
 		// Diamond step
@@ -195,8 +185,6 @@ ValueGrid::ValueGrid(unsigned size, float decay, unsigned seed)
 				value[(y + half) * width + (x + half)] = (v00 + v10 + v01 + v11) / 4.0f + dist(rando) * range;
 			}
 		}
-
-		
 
 		// Square step - top / bottom edges
 		for (unsigned x = half; x < limit_x; x += stride)

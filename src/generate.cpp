@@ -137,10 +137,10 @@ void Heightmap::random(unsigned seed, float min, float max, unsigned frequency)
 	}
 }
 
-void Heightmap::diamondSquare(unsigned seed, float min, float max, unsigned size, float decay)
+void Heightmap::diamondSquare(unsigned seed, float min, float max, unsigned size)
 {
 	// Generate noise
-	ValueGrid grid(size, decay, seed);
+	ValueGrid grid(size, seed);
 
 	// Add frequency constants so the heightmap coordinates stay in the grid
 	float fx = (float)(grid.getWidth() - 1) / width_x;

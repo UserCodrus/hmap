@@ -59,7 +59,7 @@ public:
 	 */
 	void random(unsigned seed, float min, float max, unsigned frequency);
 
-	void diamondSquare(unsigned seed, float min, float max, unsigned size, float decay);
+	void diamondSquare(unsigned seed, float min, float max, unsigned size);
 
 private:
 	hdata* data;
