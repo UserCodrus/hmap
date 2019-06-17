@@ -132,7 +132,30 @@ void Heightmap::random(unsigned seed, float min, float max, unsigned frequency)
 	{
 		for (unsigned x = 0; x < width_x; ++x)
 		{
-			setHeight(x, y, (hdata)(grid.noise(x * fx, y * fy) * delta + bottom));
+			setHeight(x, y, (hdata)((grid.noise(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
+		}
+	}
+}
+
+void Heightmap::diamondSquare(unsigned seed, float min, float max, unsigned size, float decay)
+{
+	// Generate noise
+	ValueGrid grid(size, decay, seed);
+
+	// Add frequency constants so the heightmap coordinates stay in the grid
+	float fx = (float)(grid.getWidth() - 1) / width_x;
+	float fy = (float)(grid.getHeight() - 1) / width_y;
+
+	// Get the limits of the heightmap
+	float bottom = min * std::numeric_limits<hdata>::max();
+	float delta = (max - min) * std::numeric_limits<hdata>::max();
+
+	// Apply noise
+	for (unsigned y = 0; y < width_y; ++y)
+	{
+		for (unsigned x = 0; x < width_x; ++x)
+		{
+			setHeight(x, y, (hdata)((grid.noise(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
 		}
 	}
 }

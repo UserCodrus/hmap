@@ -42,7 +42,7 @@ public:
 	// Constructor for value noise
 	ValueGrid(unsigned _width, unsigned _height, unsigned seed);
 	// Constructor for diamond square noise
-	ValueGrid(unsigned size, unsigned seed);
+	ValueGrid(unsigned size, float decay, unsigned seed);
 	~ValueGrid();
 
 	float getValue(unsigned x, unsigned y) const;
