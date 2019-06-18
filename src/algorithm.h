@@ -15,11 +15,11 @@ struct Vector2
 
 // A gradient grid filled with random unit vectors
 // Used to generate Perlin noise and simplex noise
-class GradientGrid
+class GradientNoise
 {
 public:
-	GradientGrid(unsigned _width, unsigned _height, unsigned seed);
-	~GradientGrid();
+	GradientNoise(unsigned _width, unsigned _height, unsigned seed);
+	~GradientNoise();
 
 	Vector2 getGradient(unsigned x, unsigned y) const;
 	unsigned getWidth();
@@ -28,34 +28,40 @@ public:
 	// Get Perlin noise at the specified coordinate
 	float perlin(float x, float y) const;
 
-private:
+protected:
 	unsigned width;
 	unsigned height;
 	Vector2* gradient = nullptr;
 };
 
-// A value grid with random values at each point
-// Used to generate value noise and diamond square noise
-class ValueGrid
+// A value noise grid with random values at each point
+class ValueNoise
 {
 public:
-	// Constructor for value noise
-	ValueGrid(unsigned _width, unsigned _height, unsigned seed);
-	// Constructor for diamond square noise
-	ValueGrid(unsigned size, unsigned seed);
-	~ValueGrid();
+	ValueNoise();
+	ValueNoise(unsigned _width, unsigned _height, unsigned seed);
+	~ValueNoise();
 
 	float getValue(unsigned x, unsigned y) const;
 	unsigned getWidth();
 	unsigned getHeight();
 
-	// Get interpolated noise
-	float noise(float x, float y) const;
+	// Get bilinear interpolated noise
+	float linear(float x, float y) const;
+	// Get bilinear interpolated noise with smoothstep interpolation
+	float stepped(float x, float y) const;
 
-private:
+protected:
 	unsigned width;
 	unsigned height;
 	float* value = nullptr;
+};
+
+// A value noise grid created using the diamond square algorithm
+class PlasmaNoise : public ValueNoise
+{
+public:
+	PlasmaNoise(unsigned size, unsigned seed);
 };
 
 // Generate a set of permutations for hashed perlin noise gradients

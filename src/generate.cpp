@@ -6,7 +6,7 @@
 void Heightmap::perlinOctaves(unsigned seed, float min, float max, unsigned grid_size, unsigned octaves, float persistence)
 {
 	// Create the gradient grid
-	GradientGrid grad(grid_size, grid_size, seed);
+	GradientNoise grad(grid_size, grid_size, seed);
 	//unsigned width = map.getWidthX();
 	//unsigned height = map.getWidthY();
 
@@ -82,8 +82,8 @@ void Heightmap::perlinNotch(unsigned seed, float min, float max, unsigned base_f
 	}
 	
 	// Create the gradient grid
-	GradientGrid base(base_frequency + 1, base_frequency + 1, seed);
-	GradientGrid mod(detail_frequency + 1, detail_frequency + 1, ++seed);
+	GradientNoise base(base_frequency + 1, base_frequency + 1, seed);
+	GradientNoise mod(detail_frequency + 1, detail_frequency + 1, ++seed);
 	//unsigned width = map.getWidthX();
 	//unsigned height = map.getWidthY();
 
@@ -117,7 +117,7 @@ void Heightmap::perlinNotch(unsigned seed, float min, float max, unsigned base_f
 void Heightmap::random(unsigned seed, float min, float max, unsigned frequency)
 {
 	// Generate noise
-	ValueGrid grid(frequency, frequency, seed);
+	ValueNoise grid(frequency, frequency, seed);
 
 	// Add frequency constants so the heightmap coordinates stay in the grid
 	float fx = (float)(grid.getWidth() - 1) / width_x;
@@ -132,7 +132,7 @@ void Heightmap::random(unsigned seed, float min, float max, unsigned frequency)
 	{
 		for (unsigned x = 0; x < width_x; ++x)
 		{
-			setHeight(x, y, (hdata)((grid.noise(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
+			setHeight(x, y, (hdata)((grid.linear(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
 		}
 	}
 }
@@ -140,7 +140,7 @@ void Heightmap::random(unsigned seed, float min, float max, unsigned frequency)
 void Heightmap::diamondSquare(unsigned seed, float min, float max, unsigned size)
 {
 	// Generate noise
-	ValueGrid grid(size, seed);
+	PlasmaNoise grid(size, seed);
 
 	// Add frequency constants so the heightmap coordinates stay in the grid
 	float fx = (float)(grid.getWidth() - 1) / width_x;
@@ -155,7 +155,7 @@ void Heightmap::diamondSquare(unsigned seed, float min, float max, unsigned size
 	{
 		for (unsigned x = 0; x < width_x; ++x)
 		{
-			setHeight(x, y, (hdata)((grid.noise(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
+			setHeight(x, y, (hdata)((grid.linear(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
 		}
 	}
 }

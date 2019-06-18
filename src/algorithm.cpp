@@ -47,7 +47,7 @@ float grad(int hash, float x, float y)
 /// Perlin and simplex noise
 ///
 
-GradientGrid::GradientGrid(unsigned _width, unsigned _height, unsigned seed)
+GradientNoise::GradientNoise(unsigned _width, unsigned _height, unsigned seed)
 {
 	width = _width;
 	height = _height;
@@ -68,7 +68,7 @@ GradientGrid::GradientGrid(unsigned _width, unsigned _height, unsigned seed)
 	}
 }
 
-GradientGrid::~GradientGrid()
+GradientNoise::~GradientNoise()
 {
 	if (gradient != nullptr)
 	{
@@ -76,22 +76,22 @@ GradientGrid::~GradientGrid()
 	}
 }
 
-Vector2 GradientGrid::getGradient(unsigned x, unsigned y) const
+Vector2 GradientNoise::getGradient(unsigned x, unsigned y) const
 {
 	return gradient[y * width + x];
 }
 
-unsigned GradientGrid::getWidth()
+unsigned GradientNoise::getWidth()
 {
 	return width;
 }
 
-unsigned GradientGrid::getHeight()
+unsigned GradientNoise::getHeight()
 {
 	return height;
 }
 
-float GradientGrid::perlin(float x, float y) const
+float GradientNoise::perlin(float x, float y) const
 {
 	// Get the coordinates of the grid cell containing x, y
 	int X = (int)x;
@@ -122,7 +122,14 @@ float GradientGrid::perlin(float x, float y) const
 /// Value & diamond square noise
 ///
 
-ValueGrid::ValueGrid(unsigned _width, unsigned _height, unsigned seed)
+ValueNoise::ValueNoise()
+{
+	// Currently unused
+	width = 0;
+	height = 0;
+}
+
+ValueNoise::ValueNoise(unsigned _width, unsigned _height, unsigned seed)
 {
 	width = _width;
 	height = _height;
@@ -140,7 +147,68 @@ ValueGrid::ValueGrid(unsigned _width, unsigned _height, unsigned seed)
 	}
 }
 
-ValueGrid::ValueGrid(unsigned size, unsigned seed)
+ValueNoise::~ValueNoise()
+{
+	if (value != nullptr)
+	{
+		delete[] value;
+	}
+}
+
+float ValueNoise::getValue(unsigned x, unsigned y) const
+{
+	return value[y * width + x];
+}
+
+unsigned ValueNoise::getWidth()
+{
+	return width;
+}
+
+unsigned ValueNoise::getHeight()
+{
+	return height;
+}
+
+float ValueNoise::linear(float x, float y) const
+{
+	// Get the coordinates of the grid cell containing x, y
+	int X = (int)x;
+	int Y = (int)y;
+
+	// Subtract the cell coordinates from x and y to get their fractional portion
+	x -= X;
+	y -= Y;
+
+	// Interpolate the noise
+	return lerp(x,
+		lerp(y, value[Y * width + X],			value[(Y + 1) * width + X]),
+		lerp(y, value[Y * width + (X + 1)],		value[(Y + 1) * width + (X + 1)])
+	);
+}
+
+float ValueNoise::stepped(float x, float y) const
+{
+	// Get the coordinates of the grid cell containing x, y
+	int X = (int)x;
+	int Y = (int)y;
+
+	// Subtract the cell coordinates from x and y to get their fractional portion
+	x -= X;
+	y -= Y;
+
+	// Apply smoothstep to the coordinates
+	x = fade(x);
+	y = fade(y);
+
+	// Interpolate the noise
+	return lerp(x,
+		lerp(y, value[Y * width + X], value[(Y + 1) * width + X]),
+		lerp(y, value[Y * width + (X + 1)], value[(Y + 1) * width + (X + 1)])
+	);
+}
+
+PlasmaNoise::PlasmaNoise(unsigned size, unsigned seed)
 {
 	width = (unsigned)pow(2, size) + 1;
 	height = width;
@@ -160,7 +228,7 @@ ValueGrid::ValueGrid(unsigned size, unsigned seed)
 
 	// The size of the current fractal
 	unsigned stride = width - 1;
-	
+
 	unsigned limit_x = width - 1;
 	unsigned limit_y = height - 1;
 
@@ -247,46 +315,6 @@ ValueGrid::ValueGrid(unsigned size, unsigned seed)
 
 		stride /= 2;
 	}
-}
-
-ValueGrid::~ValueGrid()
-{
-	if (value != nullptr)
-	{
-		delete[] value;
-	}
-}
-
-float ValueGrid::getValue(unsigned x, unsigned y) const
-{
-	return value[y * width + x];
-}
-
-unsigned ValueGrid::getWidth()
-{
-	return width;
-}
-
-unsigned ValueGrid::getHeight()
-{
-	return height;
-}
-
-float ValueGrid::noise(float x, float y) const
-{
-	// Get the coordinates of the grid cell containing x, y
-	int X = (int)x;
-	int Y = (int)y;
-
-	// Subtract the cell coordinates from x and y to get their fractional portion
-	x -= X;
-	y -= Y;
-
-	// Interpolate the noise
-	return lerp(x,
-		lerp(y, value[Y * width + X],			value[(Y + 1) * width + X]),
-		lerp(y, value[Y * width + (X + 1)],		value[(Y + 1) * width + (X + 1)])
-	);
 }
 
 ///
