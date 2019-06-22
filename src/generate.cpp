@@ -132,7 +132,7 @@ void Heightmap::random(unsigned seed, float min, float max, unsigned frequency)
 	{
 		for (unsigned x = 0; x < width_x; ++x)
 		{
-			setHeight(x, y, (hdata)((grid.linear(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
+			setHeight(x, y, (hdata)((grid.cubic(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
 		}
 	}
 }

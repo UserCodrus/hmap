@@ -102,15 +102,28 @@ int main(int argc, char** argv)
 	// Create the heightmap
 	cout << "Generating heightmap... ";
 	Heightmap map(width, height);
-	//perlinOctaves(map, seed, 0.33f, 0.66f, 16, 4, 0.6f);
-	//map.perlinNotch(seed, 0.36f, 0.66f, 3, 12, 0.6f);
-	//map.random(seed, 0.0f, 1.0f, 16);
-	map.diamondSquare(seed, 0.0f, 1.0f, 8);
-
-	// Measure the time taken to create the heightmap
 	auto t_gen = Timer::now();
-	chrono::duration<double> delta = t_gen - t_start;
-	cout << delta.count() << "s\n";
+	double total = 0.0;
+	unsigned count = 100;
+
+	for (unsigned i = 0; i < count; ++i)
+	{
+		cout << endl << i + 1 << ": ";
+
+		//map.perlinOctaves(map, seed, 0.33f, 0.66f, 16, 4, 0.6f);
+		//map.perlinNotch(seed, 0.36f, 0.66f, 3, 12, 0.6f);
+		map.random(seed, 0.0f, 1.0f, 16);
+		//map.diamondSquare(seed, 0.0f, 1.0f, 8);
+
+		// Measure the time taken to create the heightmap
+		t_gen = Timer::now();
+		chrono::duration<double> delta = t_gen - t_start;
+		t_start = t_gen;
+		total += delta.count();
+		cout << delta.count() << "s";
+	}
+
+	cout << "\n\nAverage:" << total / count << "\n\n";
 
 	// Load height data into a byte buffer
 	cout << "Exporting heightmap... ";
@@ -130,7 +143,7 @@ int main(int argc, char** argv)
 
 		// Measure the time taken to package the heightmap
 		auto t_pack = Timer::now();
-		delta = t_pack - t_gen;
+		chrono::duration<double> delta = t_pack - t_gen;
 		cout << delta.count() << "s\n";
 
 		cout << "Heightmap saved to " << fname << endl;

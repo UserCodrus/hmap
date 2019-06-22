@@ -13,13 +13,19 @@ constexpr float pi = 3.141592f;
 ///
 
 // Linear interpolation
-float lerp(float t, float a, float b)
+inline float lerp(float t, float a, float b)
 {
 	return a + t * (b - a);
 }
 
+// Cubic interpolation
+inline float curp(float t, float a[4])
+{
+	return a[1] + 0.5f * t * (a[2] - a[0] + t * (2.0f * a[0] - 5.0f * a[1] + 4.0f * a[2] - a[3] + t * (3.0f * (a[1] - a[2]) + a[3] - a[0])));
+}
+
 // Perlin smoothstep
-float fade(float t)
+inline float fade(float t)
 {
 	return t * t * t * (t * (t * 6 - 15) + 10);
 }
@@ -185,6 +191,54 @@ float ValueNoise::linear(float x, float y) const
 		lerp(y, value[Y * width + X],			value[(Y + 1) * width + X]),
 		lerp(y, value[Y * width + (X + 1)],		value[(Y + 1) * width + (X + 1)])
 	);
+}
+
+float ValueNoise::cubic(float x, float y) const
+{
+	// Get the coordinates of the grid cell containing x, y
+	int X = (int)x;
+	int Y = (int)y;
+
+	// Subtract the cell coordinates from x and y to get their fractional portion
+	x -= X;
+	y -= Y;
+
+	if (X > 0 && Y > 0 && X < (int)(width - 2) && Y < (int)(height - 2))
+	{
+		//float a, b, c, d;
+		//float A, B, C, D;
+		//unsigned loc;
+
+		float a[4];
+		a[0] = curp(x, value + ((Y - 1) * width + (X - 1)));
+		a[1] = curp(x, value + (Y * width + (X - 1)));
+		a[2] = curp(x, value + ((Y + 1) * width + (X - 1)));
+		a[3] = curp(x, value + ((Y + 2) * width + (X - 1)));
+
+		//loc = (Y - 1) * width + (X - 1);
+		//a = value[loc]; b = value[loc + 1]; c = value[loc + 2]; d = value[loc + 3];
+		//A = b + 0.5f * x * (c - a + x * (2.0f * a - 5.0f * b + 4.0f * c - d + x * (3.0f * (b - c) + d - a)));
+
+		//loc = Y * width + (X - 1);
+		//a = value[loc]; b = value[loc + 1]; c = value[loc + 2]; d = value[loc + 3];
+		//B = b + 0.5f * x * (c - a + x * (2.0f * a - 5.0f * b + 4.0f * c - d + x * (3.0f * (b - c) + d - a)));
+
+		//loc = (Y + 1) * width + (X - 1);
+		//a = value[loc]; b = value[loc + 1]; c = value[loc + 2]; d = value[loc + 3];
+		//C = b + 0.5f * x * (c - a + x * (2.0f * a - 5.0f * b + 4.0f * c - d + x * (3.0f * (b - c) + d - a)));
+
+		//loc = (Y + 2) * width + (X - 1);
+		//a = value[loc]; b = value[loc + 1]; c = value[loc + 2]; d = value[loc + 3];
+		//D = b + 0.5f * x * (c - a + x * (2.0f * a - 5.0f * b + 4.0f * c - d + x * (3.0f * (b - c) + d - a)));
+
+		//return std::min(1.0f, std::max(B + 0.5f * y * (C - A + y * (2.0f * A - 5.0f * B + 4.0f * C - D + y * (3.0f * (B - C) + D - A))), -1.0f));
+
+		return std::min(1.0f, std::max(curp(y, a), -1.0f));
+	}
+	else
+	{
+		return 0.0f;
+	}
 }
 
 float ValueNoise::stepped(float x, float y) const
