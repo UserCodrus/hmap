@@ -18,6 +18,13 @@ inline float lerp(float t, float a, float b)
 	return a + t * (b - a);
 }
 
+// Cosine interpolation
+inline float corp(float t, float a, float b)
+{
+	float u = (1 - std::cos(t * pi)) / 2;
+	return a * (1 - u) + b * u;
+}
+
 // Cubic interpolation
 inline float curp(float t, float a[4])
 {
@@ -193,6 +200,23 @@ float ValueNoise::linear(float x, float y) const
 	);
 }
 
+float ValueNoise::cosine(float x, float y) const
+{
+	// Get the coordinates of the grid cell containing x, y
+	int X = (int)x;
+	int Y = (int)y;
+
+	// Subtract the cell coordinates from x and y to get their fractional portion
+	x -= X;
+	y -= Y;
+
+	// Interpolate the noise
+	return corp(x,
+		corp(y, value[Y * width + X], value[(Y + 1) * width + X]),
+		corp(y, value[Y * width + (X + 1)], value[(Y + 1) * width + (X + 1)])
+	);
+}
+
 float ValueNoise::cubic(float x, float y) const
 {
 	// Get the coordinates of the grid cell containing x, y
@@ -239,27 +263,6 @@ float ValueNoise::cubic(float x, float y) const
 	{
 		return 0.0f;
 	}
-}
-
-float ValueNoise::stepped(float x, float y) const
-{
-	// Get the coordinates of the grid cell containing x, y
-	int X = (int)x;
-	int Y = (int)y;
-
-	// Subtract the cell coordinates from x and y to get their fractional portion
-	x -= X;
-	y -= Y;
-
-	// Apply smoothstep to the coordinates
-	x = fade(x);
-	y = fade(y);
-
-	// Interpolate the noise
-	return lerp(x,
-		lerp(y, value[Y * width + X], value[(Y + 1) * width + X]),
-		lerp(y, value[Y * width + (X + 1)], value[(Y + 1) * width + (X + 1)])
-	);
 }
 
 PlasmaNoise::PlasmaNoise(unsigned size, unsigned seed)

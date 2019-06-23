@@ -48,10 +48,10 @@ public:
 
 	// Bilinear interpolated noise
 	float linear(float x, float y) const;
+	// Cosine interpolated noise
+	float cosine(float x, float y) const;
 	// Cubic interpolated noise
 	float cubic(float x, float y) const;
-	// Get bilinear interpolated noise with smoothstep interpolation
-	float stepped(float x, float y) const;
 
 protected:
 	unsigned width;

@@ -106,9 +106,9 @@ int main(int argc, char** argv)
 	double total = 0.0;
 	unsigned count = 100;
 
-	for (unsigned i = 0; i < count; ++i)
-	{
-		cout << endl << i + 1 << ": ";
+	//for (unsigned i = 0; i < count; ++i)
+	//{
+		//cout << endl << i + 1 << ": ";
 
 		//map.perlinOctaves(map, seed, 0.33f, 0.66f, 16, 4, 0.6f);
 		//map.perlinNotch(seed, 0.36f, 0.66f, 3, 12, 0.6f);
@@ -120,10 +120,10 @@ int main(int argc, char** argv)
 		chrono::duration<double> delta = t_gen - t_start;
 		t_start = t_gen;
 		total += delta.count();
-		cout << delta.count() << "s";
-	}
+		cout << delta.count() << "s\n";
+	//}
 
-	cout << "\n\nAverage:" << total / count << "\n\n";
+	//cout << "\n\nAverage:" << total / count << "\n\n";
 
 	// Load height data into a byte buffer
 	cout << "Exporting heightmap... ";
