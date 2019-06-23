@@ -155,7 +155,15 @@ void Heightmap::diamondSquare(unsigned seed, float min, float max, unsigned size
 	{
 		for (unsigned x = 0; x < width_x; ++x)
 		{
-			setHeight(x, y, (hdata)((grid.linear(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
+			setHeight(x, y, (hdata)((grid.cubic(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
 		}
 	}
+}
+
+void Heightmap::def(unsigned seed, float min, float max)
+{
+	//perlinOctaves(map, seed, min, max, 16, 4, 0.6f);
+	//perlinNotch(seed, min, max, 3, 12, 0.6f);
+	random(seed, min, max, 16);
+	//diamondSquare(seed, min, max, 8);
 }

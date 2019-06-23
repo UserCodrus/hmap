@@ -61,6 +61,9 @@ public:
 
 	void diamondSquare(unsigned seed, float min, float max, unsigned size);
 
+	// Default heightmap generator
+	void def(unsigned seed, float min, float max);
+
 private:
 	hdata* data;
 	unsigned width_x;

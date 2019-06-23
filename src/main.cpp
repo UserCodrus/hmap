@@ -18,6 +18,9 @@ int main(int argc, char** argv)
 	unsigned height = 1024;			// Heightmap height
 	float min_height = 0.0f;		// Minimum map height
 	float max_height = 1.0f;		// Maximum map height
+
+	string generator_name;			// The name of the generator being used
+	vector<float> generator_data;	// Data for the heightmap generator
 	
 	// Get the start time
 	auto t_start = Timer::now();
@@ -43,6 +46,7 @@ int main(int argc, char** argv)
 			{
 				switch (argv[i][1])
 				{
+				case 'W':
 				case 'w':
 					// Get the width of the heightmap
 					if (argc > i + 1)
@@ -59,6 +63,7 @@ int main(int argc, char** argv)
 					}
 					break;
 
+				case 'H':
 				case 'h':
 					// Get the height of the heightmap
 					if (argc > i + 1)
@@ -75,6 +80,7 @@ int main(int argc, char** argv)
 					}
 					break;
 
+				case 'S':
 				case 's':
 					// Get the rng seed
 					if (argc > i + 1)
@@ -91,6 +97,7 @@ int main(int argc, char** argv)
 					}
 					break;
 
+				case 'T':
 				case 't':
 					// Get the maximum height
 					if (argc > i + 1)
@@ -107,6 +114,7 @@ int main(int argc, char** argv)
 					}
 					break;
 
+				case 'B':
 				case 'b':
 					// Get the minimum height
 					if (argc > i + 1)
@@ -122,6 +130,54 @@ int main(int argc, char** argv)
 						}
 					}
 					break;
+
+				case 'G':
+				case 'g':
+					// Get the name of the generator
+					if (argc > i + 1)
+					{
+						++i;
+						generator_name = argv[i];
+
+						// Get data input for the generator
+						if (argc > i + 1)
+						{
+							++i;
+							try
+							{
+								while (true)
+								{
+									// Add the data
+									generator_data.push_back(stof(argv[i]));
+
+									// Move to the next string
+									if (argc > i + 1)
+									{
+										if (argv[i + 1][0] == '-' || argv[i + 1][0] == '/')
+										{
+											// Next string is a switch
+											break;
+										}
+										else
+										{
+											++i;
+										}
+									}
+									else
+									{
+										// Out of strings
+										break;
+									}
+								}
+							}
+							catch (invalid_argument e)
+							{
+								cout << "Invalid height value";
+								return 0;
+							}
+						}
+					}
+					break;
 				}
 			}
 		}
@@ -131,7 +187,22 @@ int main(int argc, char** argv)
 	cout << "Seed value: " << seed << endl;
 	cout << "Width: " << width << ", Height: " << height << endl;
 	cout << "Upper bound: " << max_height << ", Lower bound: " << min_height << endl;
+	cout << "Generator: ";
+	if (!generator_name.empty())
+	{
+		cout << generator_name;
+		for (unsigned i = 0; i < generator_data.size(); ++i)
+		{
+			cout << " " << generator_data[i];
+		}
+	}
+	else
+	{
+		cout << "default";
+	}
+	cout << endl;
 
+	// Check parameters
 	if (width == 0 || height == 0 || max_height > 1.0f || min_height < 0.0f)
 	{
 		cout << "Heightmap dimensions are invalid";
@@ -142,10 +213,32 @@ int main(int argc, char** argv)
 	cout << "\nGenerating heightmap... ";
 	Heightmap map(width, height);
 
-	//map.perlinOctaves(map, seed, min_height, max_height, 16, 4, 0.6f);
-	//map.perlinNotch(seed, min_height, max_height, 3, 12, 0.6f);
-	map.random(seed, min_height, max_height, 16);
-	//map.diamondSquare(seed, min_height, max_height, 8);
+	bool done = false;
+	if (!generator_name.empty())
+	{
+		// Use the specified generator
+		if (generator_name == "random" || generator_name == "Random")
+		{
+			if (generator_data.size() > 0)
+			{
+				map.random(seed, min_height, max_height, (unsigned)generator_data[0]);
+				done = true;
+			}
+		}
+		else if (generator_name == "plasma" || generator_name == "Plasma")
+		{
+			if (generator_data.size() > 0)
+			{
+				map.diamondSquare(seed, min_height, max_height, (unsigned)generator_data[0]);
+				done = true;
+			}
+		}
+	}
+
+	if (!done)
+	{
+		map.def(seed, min_height, max_height);
+	}
 
 	// Measure the time taken to create the heightmap
 	auto t_gen = Timer::now();
@@ -170,7 +263,7 @@ int main(int argc, char** argv)
 
 		// Measure the time taken to package the heightmap
 		auto t_pack = Timer::now();
-		chrono::duration<double> delta = t_pack - t_gen;
+		delta = t_pack - t_gen;
 		cout << delta.count() << "s";
 
 		cout << "\n\nHeightmap saved to " << fname << endl;
