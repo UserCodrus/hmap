@@ -13,29 +13,36 @@ struct Vector2
 	float y = 0.0f;
 };
 
+class Noise
+{
+public:
+	unsigned getWidth();
+	unsigned getHeight();
+
+protected:
+	unsigned width;
+	unsigned height;
+};
+
 // A gradient grid filled with random unit vectors
 // Used to generate Perlin noise and simplex noise
-class GradientNoise
+class GradientNoise : public Noise
 {
 public:
 	GradientNoise(unsigned _width, unsigned _height, unsigned seed);
 	~GradientNoise();
 
 	Vector2 getGradient(unsigned x, unsigned y) const;
-	unsigned getWidth();
-	unsigned getHeight();
 
 	// Get Perlin noise at the specified coordinate
 	float perlin(float x, float y) const;
 
 protected:
-	unsigned width;
-	unsigned height;
 	Vector2* gradient = nullptr;
 };
 
 // A value noise grid with random values at each point
-class ValueNoise
+class ValueNoise : public Noise
 {
 public:
 	ValueNoise();
@@ -43,8 +50,6 @@ public:
 	~ValueNoise();
 
 	float getValue(unsigned x, unsigned y) const;
-	unsigned getWidth();
-	unsigned getHeight();
 
 	// Bilinear interpolated noise
 	float linear(float x, float y) const;
@@ -54,8 +59,6 @@ public:
 	float cubic(float x, float y) const;
 
 protected:
-	unsigned width;
-	unsigned height;
 	float* value = nullptr;
 };
 

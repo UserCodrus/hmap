@@ -57,6 +57,20 @@ float grad(int hash, float x, float y)
 }
 
 ///
+/// Base noise
+///
+
+unsigned Noise::getWidth()
+{
+	return width;
+}
+
+unsigned Noise::getHeight()
+{
+	return height;
+}
+
+///
 /// Perlin and simplex noise
 ///
 
@@ -92,16 +106,6 @@ GradientNoise::~GradientNoise()
 Vector2 GradientNoise::getGradient(unsigned x, unsigned y) const
 {
 	return gradient[y * width + x];
-}
-
-unsigned GradientNoise::getWidth()
-{
-	return width;
-}
-
-unsigned GradientNoise::getHeight()
-{
-	return height;
 }
 
 float GradientNoise::perlin(float x, float y) const
@@ -171,16 +175,6 @@ ValueNoise::~ValueNoise()
 float ValueNoise::getValue(unsigned x, unsigned y) const
 {
 	return value[y * width + x];
-}
-
-unsigned ValueNoise::getWidth()
-{
-	return width;
-}
-
-unsigned ValueNoise::getHeight()
-{
-	return height;
 }
 
 float ValueNoise::linear(float x, float y) const
