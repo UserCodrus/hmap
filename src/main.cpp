@@ -16,6 +16,8 @@ int main(int argc, char** argv)
 	string fname = "heightmap.png";	// The filename the png will be saved to
 	unsigned width = 1024;			// Heightmap width
 	unsigned height = 1024;			// Heightmap height
+	float min_height = 0.0f;		// Minimum map height
+	float max_height = 1.0f;		// Maximum map height
 	
 	// Get the start time
 	auto t_start = Timer::now();
@@ -88,45 +90,70 @@ int main(int argc, char** argv)
 						}
 					}
 					break;
+
+				case 't':
+					// Get the maximum height
+					if (argc > i + 1)
+					{
+						try
+						{
+							max_height = stof(argv[++i]);
+						}
+						catch (invalid_argument e)
+						{
+							cout << "Invalid height value";
+							return 0;
+						}
+					}
+					break;
+
+				case 'b':
+					// Get the minimum height
+					if (argc > i + 1)
+					{
+						try
+						{
+							min_height = stof(argv[++i]);
+						}
+						catch (invalid_argument e)
+						{
+							cout << "Invalid height value";
+							return 0;
+						}
+					}
+					break;
 				}
 			}
 		}
 	}
 
-	if (width == 0 || height == 0)
+	// Display selected parameters
+	cout << "Seed value: " << seed << endl;
+	cout << "Width: " << width << ", Height: " << height << endl;
+	cout << "Upper bound: " << max_height << ", Lower bound: " << min_height << endl;
+
+	if (width == 0 || height == 0 || max_height > 1.0f || min_height < 0.0f)
 	{
 		cout << "Heightmap dimensions are invalid";
 		return 0;
 	}
 
 	// Create the heightmap
-	cout << "Generating heightmap... ";
+	cout << "\nGenerating heightmap... ";
 	Heightmap map(width, height);
+
+	//map.perlinOctaves(map, seed, min_height, max_height, 16, 4, 0.6f);
+	//map.perlinNotch(seed, min_height, max_height, 3, 12, 0.6f);
+	map.random(seed, min_height, max_height, 16);
+	//map.diamondSquare(seed, min_height, max_height, 8);
+
+	// Measure the time taken to create the heightmap
 	auto t_gen = Timer::now();
-	double total = 0.0;
-	unsigned count = 100;
-
-	//for (unsigned i = 0; i < count; ++i)
-	//{
-		//cout << endl << i + 1 << ": ";
-
-		//map.perlinOctaves(map, seed, 0.33f, 0.66f, 16, 4, 0.6f);
-		//map.perlinNotch(seed, 0.36f, 0.66f, 3, 12, 0.6f);
-		map.random(seed, 0.0f, 1.0f, 16);
-		//map.diamondSquare(seed, 0.0f, 1.0f, 8);
-
-		// Measure the time taken to create the heightmap
-		t_gen = Timer::now();
-		chrono::duration<double> delta = t_gen - t_start;
-		t_start = t_gen;
-		total += delta.count();
-		cout << delta.count() << "s\n";
-	//}
-
-	//cout << "\n\nAverage:" << total / count << "\n\n";
+	chrono::duration<double> delta = t_gen - t_start;
+	cout << delta.count() << "s";
 
 	// Load height data into a byte buffer
-	cout << "Exporting heightmap... ";
+	cout << "\nExporting heightmap... ";
 	PixelBuffer image(map.getWidthX(), map.getWidthY(), map.getSize());
 	for (unsigned y = 0; y < map.getWidthY(); ++y)
 	{
@@ -144,13 +171,13 @@ int main(int argc, char** argv)
 		// Measure the time taken to package the heightmap
 		auto t_pack = Timer::now();
 		chrono::duration<double> delta = t_pack - t_gen;
-		cout << delta.count() << "s\n";
+		cout << delta.count() << "s";
 
-		cout << "Heightmap saved to " << fname << endl;
+		cout << "\n\nHeightmap saved to " << fname << endl;
 	}
 	catch (exception& e)
 	{
-		cout << "Export failed:\n" << e.what() << endl;
+		cout << "\n\nExport failed:\n" << e.what() << endl;
 	}
 
 	return 0;

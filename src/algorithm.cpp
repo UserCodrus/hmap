@@ -227,42 +227,117 @@ float ValueNoise::cubic(float x, float y) const
 	x -= X;
 	y -= Y;
 
-	if (X > 0 && Y > 0 && X < (int)(width - 2) && Y < (int)(height - 2))
+	float a[4], p[4];
+
+	// Second point
+	p[1] = value[Y * width + X];
+	p[2] = value[Y * width + (X + 1)];
+	if (X > 0)
 	{
-		//float a, b, c, d;
-		//float A, B, C, D;
-		//unsigned loc;
-
-		float a[4];
-		a[0] = curp(x, value + ((Y - 1) * width + (X - 1)));
-		a[1] = curp(x, value + (Y * width + (X - 1)));
-		a[2] = curp(x, value + ((Y + 1) * width + (X - 1)));
-		a[3] = curp(x, value + ((Y + 2) * width + (X - 1)));
-
-		//loc = (Y - 1) * width + (X - 1);
-		//a = value[loc]; b = value[loc + 1]; c = value[loc + 2]; d = value[loc + 3];
-		//A = b + 0.5f * x * (c - a + x * (2.0f * a - 5.0f * b + 4.0f * c - d + x * (3.0f * (b - c) + d - a)));
-
-		//loc = Y * width + (X - 1);
-		//a = value[loc]; b = value[loc + 1]; c = value[loc + 2]; d = value[loc + 3];
-		//B = b + 0.5f * x * (c - a + x * (2.0f * a - 5.0f * b + 4.0f * c - d + x * (3.0f * (b - c) + d - a)));
-
-		//loc = (Y + 1) * width + (X - 1);
-		//a = value[loc]; b = value[loc + 1]; c = value[loc + 2]; d = value[loc + 3];
-		//C = b + 0.5f * x * (c - a + x * (2.0f * a - 5.0f * b + 4.0f * c - d + x * (3.0f * (b - c) + d - a)));
-
-		//loc = (Y + 2) * width + (X - 1);
-		//a = value[loc]; b = value[loc + 1]; c = value[loc + 2]; d = value[loc + 3];
-		//D = b + 0.5f * x * (c - a + x * (2.0f * a - 5.0f * b + 4.0f * c - d + x * (3.0f * (b - c) + d - a)));
-
-		//return std::min(1.0f, std::max(B + 0.5f * y * (C - A + y * (2.0f * A - 5.0f * B + 4.0f * C - D + y * (3.0f * (B - C) + D - A))), -1.0f));
-
-		return std::min(1.0f, std::max(curp(y, a), -1.0f));
+		p[0] = value[Y * width + (X - 1)];
 	}
 	else
 	{
-		return 0.0f;
+		// Extrapolate the middle points if we are near an edge
+		p[0] = p[1] - (p[2] - p[1]);
 	}
+	if (X < (int)(width - 2))
+	{
+		p[3] = value[Y * width + (X + 2)];
+	}
+	else
+	{
+		// Extrapolate the middle points if we are near an edge
+		p[3] = p[2] + (p[2] - p[1]);
+	}
+	a[1] = curp(x, p);
+
+	// Third point
+	p[1] = value[(Y + 1) * width + X];
+	p[2] = value[(Y + 1) * width + (X + 1)];
+	if (X > 0)
+	{
+		p[0] = value[(Y + 1) * width + (X - 1)];
+	}
+	else
+	{
+		// Extrapolate the middle points if we are near an edge
+		p[0] = p[1] - (p[2] - p[1]);
+	}
+	if (X < (int)(width - 2))
+	{
+		p[3] = value[(Y + 1) * width + (X + 2)];
+	}
+	else
+	{
+		// Extrapolate the middle points if we are near an edge
+		p[3] = p[2] + (p[2] - p[1]);
+	}
+	a[2] = curp(x, p);
+
+	// First point
+	if (Y > 0)
+	{
+		p[1] = value[(Y - 1) * width + X];
+		p[2] = value[(Y - 1) * width + (X + 1)];
+		if (X > 0)
+		{
+			p[0] = value[(Y - 1) * width + (X - 1)];
+		}
+		else
+		{
+			// Extrapolate the middle points if we are near an edge
+			p[0] = p[1] - (p[2] - p[1]);
+		}
+		if (X < (int)(width - 2))
+		{
+			p[3] = value[(Y - 1) * width + (X + 2)];
+		}
+		else
+		{
+			// Extrapolate the middle points if we are near an edge
+			p[3] = p[2] + (p[2] - p[1]);
+		}
+		a[0] = curp(x, p);
+	}
+	else
+	{
+		// Extrapolate the middle points if we are near an edge
+		a[0] = a[1] - (a[2] - a[1]);
+	}
+
+	// Fourth point
+	if (Y < (int)(height - 2))
+	{
+		p[1] = value[(Y + 2) * width + X];
+		p[2] = value[(Y + 2) * width + (X + 1)];
+		if (X > 0)
+		{
+			p[0] = value[(Y + 2) * width + (X - 1)];
+		}
+		else
+		{
+			// Extrapolate the middle points if we are near an edge
+			p[0] = p[1] - (p[2] - p[1]);
+		}
+		if (X < (int)(width - 2))
+		{
+			p[3] = value[(Y + 2) * width + (X + 2)];
+		}
+		else
+		{
+			// Extrapolate the middle points if we are near an edge
+			p[3] = p[2] + (p[2] - p[1]);
+		}
+		a[3] = curp(x, p);
+	}
+	else
+	{
+		// Extrapolate the middle points if we are near an edge
+		a[3] = a[2] + (a[2] - a[1]);
+	}
+
+	return std::min(1.0f, std::max(curp(y, a), -1.0f));
 }
 
 PlasmaNoise::PlasmaNoise(unsigned size, unsigned seed)
