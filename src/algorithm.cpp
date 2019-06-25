@@ -38,12 +38,12 @@ inline float fade(float t)
 /// Base noise
 ///
 
-unsigned Noise::getWidth()
+unsigned Noise::getWidth() const
 {
 	return width;
 }
 
-unsigned Noise::getHeight()
+unsigned Noise::getHeight() const
 {
 	return height;
 }

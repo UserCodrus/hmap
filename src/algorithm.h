@@ -16,8 +16,8 @@ struct Vector2
 class Noise
 {
 public:
-	unsigned getWidth();
-	unsigned getHeight();
+	unsigned getWidth() const;
+	unsigned getHeight() const;
 
 protected:
 	unsigned width;

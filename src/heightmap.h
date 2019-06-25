@@ -19,6 +19,10 @@ public:
 	unsigned getSize() const;
 	hdata getHeight(unsigned x, unsigned y) const;
 
+	// Add noise data
+	template <class T>
+	void noiseAdd(const T& noise, float (T::*sample)(float, float) const, float scale = 1.0f);
+
 	void setHeight(unsigned x, unsigned y, hdata value);
 
 	/*
@@ -69,3 +73,5 @@ private:
 	unsigned width_x;
 	unsigned width_y;
 };
+
+#include "heightmap.inl"

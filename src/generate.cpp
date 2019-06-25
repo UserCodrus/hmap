@@ -160,20 +160,6 @@ void Heightmap::def(unsigned seed, float min, float max)
 	// Create the gradient grid
 	GradientNoise base(8, 8, seed);
 
-	// Reduce the frequency of the noise a little so heightmap coordinates stay inside the grid
-	float fx_base = (float)(base.getWidth() - 1) / width_x;
-	float fy_base = (float)(base.getHeight() - 1) / width_y;
-
-	// Get the limits of the heightmap
-	float delta = (max - min) / 2.0f;
-	float bottom = min + delta;
-
-	// Apply noise
-	for (unsigned y = 0; y < width_y; ++y)
-	{
-		for (unsigned x = 0; x < width_x; ++x)
-		{
-			setHeight(x, y, base.perlin(x * fx_base, y * fy_base) * delta + bottom);
-		}
-	}
+	// Apply the noise
+	noiseAdd<GradientNoise>(base, &GradientNoise::perlin);
 }
