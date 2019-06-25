@@ -68,9 +68,3 @@ class PlasmaNoise : public ValueNoise
 public:
 	PlasmaNoise(unsigned size, unsigned seed);
 };
-
-// Generate a set of permutations for hashed perlin noise gradients
-void permutation(std::vector<int>& p, unsigned size, unsigned seed);
-
-// Classic Perlin noise function with hashed gradients
-float perlin(const int* p, float x, float y);

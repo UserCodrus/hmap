@@ -2,7 +2,7 @@
 
 #include <string>
 
-typedef uint16_t hdata;
+typedef float hdata;
 
 class Heightmap
 {

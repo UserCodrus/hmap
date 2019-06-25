@@ -88,7 +88,7 @@ void PixelBuffer::fillPixel(unsigned x, unsigned y, uint16_t value)
 void PixelBuffer::fillPixel(unsigned x, unsigned y, uint8_t value)
 {
 	// Check for a size mismatch between the pixel size and a uint8
-	if (size > sizeof(uint16_t))
+	if (size > sizeof(uint8_t))
 	{
 		throw std::overflow_error("Pixel buffer is too large to accomodate an 8 bit integer");
 	}

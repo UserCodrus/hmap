@@ -1,15 +1,8 @@
 #include "heightmap.h"
 #include "algorithm.h"
 
-#include <limits>
-
 void Heightmap::perlinOctaves(unsigned seed, float min, float max, unsigned grid_size, unsigned octaves, float persistence)
 {
-	// Create the gradient grid
-	GradientNoise grad(grid_size, grid_size, seed);
-	//unsigned width = map.getWidthX();
-	//unsigned height = map.getWidthY();
-
 	// Check input values
 	if (grid_size < 2)
 	{
@@ -28,9 +21,11 @@ void Heightmap::perlinOctaves(unsigned seed, float min, float max, unsigned grid
 		persistence = 1.0f;
 	}
 
+	// Create the gradient grid
+	GradientNoise grad(grid_size, grid_size, seed);
+
 	// Get the limits of the heightmap
-	float bottom = min * std::numeric_limits<hdata>::max();
-	float delta = (max - min) * std::numeric_limits<hdata>::max();
+	float delta = max - min;
 
 	// Apply noise
 	for (unsigned y = 0; y < width_y; ++y)
@@ -43,20 +38,20 @@ void Heightmap::perlinOctaves(unsigned seed, float min, float max, unsigned grid
 			float total_amplitude = 0.0f;
 
 			// Set the frequency so that the map coordinates will never be outside the grid
-			float fx = (1.0f / (float)pow(2, octaves - 1)) * ((float)(grid_size - 1) / (width_x + 2));
-			float fy = (1.0f / (float)pow(2, octaves - 1)) * ((float)(grid_size - 1) / (width_y + 2));
+			float fx = (1.0f / (float)pow(2, octaves - 1)) * ((float)(grid_size - 1) / width_x);
+			float fy = (1.0f / (float)pow(2, octaves - 1)) * ((float)(grid_size - 1) / width_y);
 			
 			for (unsigned o = 0; o < octaves; ++o)
 			{
-				noise += grad.perlin((x + 1) * fx, (y + 1) * fy) * amplitude;
+				noise += grad.perlin(x * fx, y * fy) * amplitude;
 				total_amplitude += amplitude;
 				amplitude *= persistence;
 				fx *= 2;
 				fy *= 2;
 			}
 
-			noise = (noise / total_amplitude + 1.0f) * 0.5f;
-			setHeight(x, y, (hdata)(noise * delta + bottom));
+			noise = noise / total_amplitude;
+			setHeight(x, y, noise);
 		}
 	}
 }
@@ -84,21 +79,16 @@ void Heightmap::perlinNotch(unsigned seed, float min, float max, unsigned base_f
 	// Create the gradient grid
 	GradientNoise base(base_frequency + 1, base_frequency + 1, seed);
 	GradientNoise mod(detail_frequency + 1, detail_frequency + 1, ++seed);
-	//unsigned width = map.getWidthX();
-	//unsigned height = map.getWidthY();
 
 	// Reduce the frequency of the noise a little so heightmap coordinates stay inside the grid
-	float fx_base = (float)(base.getWidth() - 1) / (width_x + 2);
-	float fy_base = (float)(base.getHeight() - 1) / (width_y + 2);
-	float fx_mod = (float)(mod.getWidth() - 1) / (width_x + 2);
-	float fy_mod = (float)(mod.getHeight() - 1) / (width_y + 2);
-
-	// Calculate the value needed to normalize the noise
-	float normalize = 0.5f / (1.0f + detail_level);
+	float fx_base = (float)(base.getWidth() - 1) / width_x;
+	float fy_base = (float)(base.getHeight() - 1) / width_y;
+	float fx_mod = (float)(mod.getWidth() - 1) / width_x;
+	float fy_mod = (float)(mod.getHeight() - 1) / width_y;
 
 	// Get the limits of the heightmap
-	float bottom = min * std::numeric_limits<hdata>::max();
-	float delta = (max - min) * std::numeric_limits<hdata>::max();
+	float delta = (max - min) / 2.0f;
+	float bottom = min + delta;
 
 	// Apply noise
 	float elevation, detail;
@@ -106,10 +96,10 @@ void Heightmap::perlinNotch(unsigned seed, float min, float max, unsigned base_f
 	{
 		for (unsigned x = 0; x < width_x; ++x)
 		{
-			elevation = base.perlin((x + 1) * fx_base, (y + 1) * fy_base);
-			detail = mod.perlin((x + 1) * fx_mod, (y + 1) * fy_mod);
+			elevation = base.perlin(x * fx_base, y * fy_base);
+			detail = mod.perlin(x * fx_mod, y * fy_mod);
 
-			setHeight(x, y, (hdata)(((elevation + elevation * detail * detail_level) * normalize + 0.5f) * delta + bottom));
+			setHeight(x, y, (elevation + elevation * detail * detail_level) * delta + bottom);
 		}
 	}
 }
@@ -124,15 +114,15 @@ void Heightmap::random(unsigned seed, float min, float max, unsigned frequency)
 	float fy = (float)(grid.getHeight() - 1) / width_y;
 
 	// Get the limits of the heightmap
-	float bottom = min * std::numeric_limits<hdata>::max();
-	float delta = (max - min) * std::numeric_limits<hdata>::max();
+	float delta = (max - min) / 2.0f;
+	float bottom = min + delta;
 
 	// Apply noise
 	for (unsigned y = 0; y < width_y; ++y)
 	{
 		for (unsigned x = 0; x < width_x; ++x)
 		{
-			setHeight(x, y, (hdata)((grid.cubic(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
+			setHeight(x, y, grid.cubic(x * fx, y * fy) * delta + bottom);
 		}
 	}
 }
@@ -147,23 +137,43 @@ void Heightmap::diamondSquare(unsigned seed, float min, float max, unsigned size
 	float fy = (float)(grid.getHeight() - 1) / width_y;
 
 	// Get the limits of the heightmap
-	float bottom = min * std::numeric_limits<hdata>::max();
-	float delta = (max - min) * std::numeric_limits<hdata>::max();
+	float delta = (max - min) / 2.0f;
+	float bottom = min + delta;
 
 	// Apply noise
 	for (unsigned y = 0; y < width_y; ++y)
 	{
 		for (unsigned x = 0; x < width_x; ++x)
 		{
-			setHeight(x, y, (hdata)((grid.cubic(x * fx, y * fy) * 0.5f + 0.5f) * delta + bottom));
+			setHeight(x, y, grid.cubic(x * fx, y * fy) * delta + bottom);
 		}
 	}
 }
 
 void Heightmap::def(unsigned seed, float min, float max)
 {
-	//perlinOctaves(map, seed, min, max, 16, 4, 0.6f);
+	//perlinOctaves( seed, min, max, 16, 1, 1.0f);
 	//perlinNotch(seed, min, max, 3, 12, 0.6f);
-	random(seed, min, max, 16);
+	//random(seed, min, max, 16);
 	//diamondSquare(seed, min, max, 8);
+
+	// Create the gradient grid
+	GradientNoise base(8, 8, seed);
+
+	// Reduce the frequency of the noise a little so heightmap coordinates stay inside the grid
+	float fx_base = (float)(base.getWidth() - 1) / width_x;
+	float fy_base = (float)(base.getHeight() - 1) / width_y;
+
+	// Get the limits of the heightmap
+	float delta = (max - min) / 2.0f;
+	float bottom = min + delta;
+
+	// Apply noise
+	for (unsigned y = 0; y < width_y; ++y)
+	{
+		for (unsigned x = 0; x < width_x; ++x)
+		{
+			setHeight(x, y, base.perlin(x * fx_base, y * fy_base) * delta + bottom);
+		}
+	}
 }

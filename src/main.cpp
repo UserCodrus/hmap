@@ -203,7 +203,7 @@ int main(int argc, char** argv)
 	cout << endl;
 
 	// Check parameters
-	if (width == 0 || height == 0 || max_height > 1.0f || min_height < 0.0f)
+	if (width == 0 || height == 0 || max_height > 1.0f || min_height < -1.0f || min_height >= max_height)
 	{
 		cout << "Heightmap dimensions are invalid";
 		return 0;
@@ -247,12 +247,12 @@ int main(int argc, char** argv)
 
 	// Load height data into a byte buffer
 	cout << "\nExporting heightmap... ";
-	PixelBuffer image(map.getWidthX(), map.getWidthY(), map.getSize());
+	PixelBuffer image(map.getWidthX(), map.getWidthY(), sizeof(uint16_t));
 	for (unsigned y = 0; y < map.getWidthY(); ++y)
 	{
 		for (unsigned x = 0; x < map.getWidthX(); ++x)
 		{
-			image.fillPixel(x, y, map.getHeight(x, y));
+			image.fillPixel(x, y, (uint16_t)((map.getHeight(x, y) * 0.5f + 0.5f) * std::numeric_limits<uint16_t>::max()));
 		}
 	}
 
