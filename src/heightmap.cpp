@@ -7,6 +7,16 @@ Heightmap::Heightmap()
 	data = nullptr;
 }
 
+Heightmap::Heightmap(const Heightmap& _copy)
+{
+	width_x = 0;
+	width_y = 0;
+	data = nullptr;
+
+	resize(_copy.width_x , _copy.width_y);
+	memcpy(data, _copy.data, width_x * width_y);
+}
+
 Heightmap::Heightmap(unsigned size_x, unsigned size_y)
 {
 	width_x = 0;
@@ -77,4 +87,136 @@ void Heightmap::setHeight(unsigned x, unsigned y, hdata value)
 	}
 
 	data[y * width_x + x] = value;
+}
+
+void Heightmap::set(const Heightmap& in)
+{
+	unsigned size_x = 0;
+	unsigned size_y = 0;
+
+	// Don't go outside of either heightmap
+	if (in.width_x < width_x)
+	{
+		size_x = in.width_x;
+	}
+	else
+	{
+		size_x = width_x;
+	}
+	if (in.width_y < width_y)
+	{
+		size_y = in.width_y;
+	}
+	else
+	{
+		size_y = width_y;
+	}
+
+	// Copy height data from the other map
+	for (unsigned y = 0; y < size_y; ++y)
+	{
+		for (unsigned x = 0; x < size_x; ++x)
+		{
+			data[y * width_x + x] = in.data[y * in.width_x + x];
+		}
+	}
+}
+
+void Heightmap::add(const Heightmap& in)
+{
+	unsigned size_x = 0;
+	unsigned size_y = 0;
+
+	// Don't go outside of either heightmap
+	if (in.width_x < width_x)
+	{
+		size_x = in.width_x;
+	}
+	else
+	{
+		size_x = width_x;
+	}
+	if (in.width_y < width_y)
+	{
+		size_y = in.width_y;
+	}
+	else
+	{
+		size_y = width_y;
+	}
+
+	// Add the height values from the other heightmap
+	for (unsigned y = 0; y < size_y; ++y)
+	{
+		for (unsigned x = 0; x < size_x; ++x)
+		{
+			data[y * width_x + x] += in.data[y * in.width_x + x];
+		}
+	}
+}
+
+void Heightmap::remove(const Heightmap& in)
+{
+	unsigned size_x = 0;
+	unsigned size_y = 0;
+
+	// Don't go outside of either heightmap
+	if (in.width_x < width_x)
+	{
+		size_x = in.width_x;
+	}
+	else
+	{
+		size_x = width_x;
+	}
+	if (in.width_y < width_y)
+	{
+		size_y = in.width_y;
+	}
+	else
+	{
+		size_y = width_y;
+	}
+
+	// Subtract the height values from the other heightmap
+	for (unsigned y = 0; y < size_y; ++y)
+	{
+		for (unsigned x = 0; x < size_x; ++x)
+		{
+			data[y * width_x + x] -= in.data[y * in.width_x + x];
+		}
+	}
+}
+
+void Heightmap::multiply(const Heightmap& in)
+{
+	unsigned size_x = 0;
+	unsigned size_y = 0;
+
+	// Don't go outside of either heightmap
+	if (in.width_x < width_x)
+	{
+		size_x = in.width_x;
+	}
+	else
+	{
+		size_x = width_x;
+	}
+	if (in.width_y < width_y)
+	{
+		size_y = in.width_y;
+	}
+	else
+	{
+		size_y = width_y;
+	}
+
+	// Multiply the height values of each heightmap
+	for (unsigned y = 0; y < size_y; ++y)
+	{
+		for (unsigned x = 0; x < size_x; ++x)
+		{
+			data[y * width_x + x] *= in.data[y * in.width_x + x];
+		}
+	}
 }

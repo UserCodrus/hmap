@@ -161,5 +161,5 @@ void Heightmap::def(unsigned seed, float min, float max)
 	GradientNoise base(8, 8, seed);
 
 	// Apply the noise
-	noiseAdd<GradientNoise>(base, &GradientNoise::perlin);
+	set<GradientNoise>(base, &GradientNoise::perlin);
 }

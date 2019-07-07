@@ -252,6 +252,7 @@ int main(int argc, char** argv)
 	{
 		for (unsigned x = 0; x < map.getWidthX(); ++x)
 		{
+			// Convert noise to a 16 bit integer and write it to the image
 			image.fillPixel(x, y, (uint16_t)((map.getHeight(x, y) * 0.5f + 0.5f) * std::numeric_limits<uint16_t>::max()));
 		}
 	}

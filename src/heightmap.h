@@ -8,6 +8,7 @@ class Heightmap
 {
 public:
 	Heightmap();
+	Heightmap(const Heightmap& _copy);
 	Heightmap(unsigned size_x, unsigned size_y);
 	~Heightmap();
 
@@ -18,12 +19,26 @@ public:
 	unsigned getWidthY() const;
 	unsigned getSize() const;
 	hdata getHeight(unsigned x, unsigned y) const;
-
-	// Add noise data
-	template <class T>
-	void noiseAdd(const T& noise, float (T::*sample)(float, float) const, float scale = 1.0f);
-
 	void setHeight(unsigned x, unsigned y, hdata value);
+
+	// Set the heightmap to match a noise sample
+	template <class T>
+	void set(const T& noise, float (T::* sample)(float, float) const, float scale = 1.0f);
+	// Add a noise sample to the height of the heightmap
+	template <class T>
+	void add(const T& noise, float (T::*sample)(float, float) const, float scale = 1.0f);
+	// Multiply the heightmap by a noise sample
+	template <class T>
+	void multiply(const T& noise, float (T::* sample)(float, float) const, float scale = 1.0f);
+
+	// Set the contents of the heightmap to match another heightmap
+	void set(const Heightmap& in);
+	// Add the height of another heightmap to this one
+	void add(const Heightmap& in);
+	// Subtract the height of another heightmap from this one
+	void remove(const Heightmap& in);
+	// Multiply the height of each point by the height of another heightmap
+	void multiply(const Heightmap& in);
 
 	/*
 	 * Generate a heightmap using multiple layers of Perlin noise stacked on top of one another
