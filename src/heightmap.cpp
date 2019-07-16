@@ -89,6 +89,10 @@ void Heightmap::setHeight(unsigned x, unsigned y, hdata value)
 	data[y * width_x + x] = value;
 }
 
+///
+/// Heightmap arithmatic
+///
+
 void Heightmap::set(const Heightmap& in)
 {
 	unsigned size_x = 0;
@@ -217,6 +221,65 @@ void Heightmap::multiply(const Heightmap& in)
 		for (unsigned x = 0; x < size_x; ++x)
 		{
 			data[y * width_x + x] *= in.data[y * in.width_x + x];
+		}
+	}
+}
+
+///
+/// Constant arithmatic
+///
+
+void Heightmap::set(const float c)
+{
+	for (unsigned y = 0; y < width_y; ++y)
+	{
+		for (unsigned x = 0; x < width_x; ++x)
+		{
+			data[y * width_x + x] = c;
+		}
+	}
+}
+
+void Heightmap::add(const float c)
+{
+	for (unsigned y = 0; y < width_y; ++y)
+	{
+		for (unsigned x = 0; x < width_x; ++x)
+		{
+			data[y * width_x + x] += c;
+		}
+	}
+}
+
+void Heightmap::remove(const float c)
+{
+	for (unsigned y = 0; y < width_y; ++y)
+	{
+		for (unsigned x = 0; x < width_x; ++x)
+		{
+			data[y * width_x + x] -= c;
+		}
+	}
+}
+
+void Heightmap::multiply(const float c)
+{
+	for (unsigned y = 0; y < width_y; ++y)
+	{
+		for (unsigned x = 0; x < width_x; ++x)
+		{
+			data[y * width_x + x] *= c;
+		}
+	}
+}
+
+void Heightmap::divide(const float c)
+{
+	for (unsigned y = 0; y < width_y; ++y)
+	{
+		for (unsigned x = 0; x < width_x; ++x)
+		{
+			data[y * width_x + x] /= c;
 		}
 	}
 }

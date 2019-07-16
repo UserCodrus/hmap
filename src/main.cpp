@@ -1,4 +1,4 @@
-#include "heightmap.h"
+#include "generate.h"
 #include "export.h"
 
 #include <iostream>
@@ -219,9 +219,9 @@ int main(int argc, char** argv)
 		// Use the specified generator
 		if (generator_name == "random" || generator_name == "Random")
 		{
-			if (generator_data.size() > 0)
+			if (generator_data.size() > 2)
 			{
-				map.random(seed, min_height, max_height, (unsigned)generator_data[0]);
+				randomGenerator(map, seed, min_height, max_height, (unsigned)generator_data[0], (unsigned)generator_data[1], generator_data[2]);
 				done = true;
 			}
 		}
@@ -229,7 +229,15 @@ int main(int argc, char** argv)
 		{
 			if (generator_data.size() > 0)
 			{
-				map.diamondSquare(seed, min_height, max_height, (unsigned)generator_data[0]);
+				plasmaGenerator(map, seed, min_height, max_height, (unsigned)generator_data[0]);
+				done = true;
+			}
+		}
+		else if (generator_name == "perlin" || generator_name == "Perlin")
+		{
+			if (generator_data.size() > 2)
+			{
+				perlinGenerator(map, seed, min_height, max_height, (unsigned)generator_data[0], (unsigned)generator_data[1], generator_data[2]);
 				done = true;
 			}
 		}
@@ -237,7 +245,7 @@ int main(int argc, char** argv)
 
 	if (!done)
 	{
-		map.def(seed, min_height, max_height);
+		defaultGenerator(map, seed, min_height, max_height);
 	}
 
 	// Measure the time taken to create the heightmap
