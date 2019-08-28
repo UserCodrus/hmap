@@ -2,27 +2,17 @@
 
 Heightmap::Heightmap()
 {
-	width_x = 0;
-	width_y = 0;
-	data = nullptr;
+
 }
 
 Heightmap::Heightmap(const Heightmap& _copy)
 {
-	width_x = 0;
-	width_y = 0;
-	data = nullptr;
-
 	resize(_copy.width_x , _copy.width_y);
 	memcpy(data, _copy.data, width_x * width_y);
 }
 
 Heightmap::Heightmap(unsigned size_x, unsigned size_y)
 {
-	width_x = 0;
-	width_y = 0;
-	data = nullptr;
-
 	resize(size_x, size_y);
 }
 

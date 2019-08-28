@@ -18,7 +18,11 @@ public:
 	unsigned getWidthX() const;
 	unsigned getWidthY() const;
 	unsigned getSize() const;
+	// Get the height at a given location
+	// THROWS standard exceptions if the coordinates specified are outside of the heightmap
 	hdata getHeight(unsigned x, unsigned y) const;
+	// Set the height of the heightmap at a given location
+	// THROWS standard exceptions if the coordinates specified are outside of the heightmap
 	void setHeight(unsigned x, unsigned y, hdata value);
 
 	// Set the heightmap to match a noise sample
@@ -52,9 +56,9 @@ public:
 	void divide(const float c);
 
 private:
-	hdata* data;
-	unsigned width_x;
-	unsigned width_y;
+	hdata* data = nullptr;
+	unsigned width_x = 0;
+	unsigned width_y = 0;
 };
 
 #include "heightmap.inl"

@@ -1,5 +1,3 @@
-#pragma once
-
 template <class T>
 void Heightmap::set(const T& noise, float (T::* sample)(float, float) const, float scale)
 {
