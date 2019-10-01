@@ -5,16 +5,15 @@
 
 void defaultGenerator(Heightmap& map, unsigned seed, float min, float max)
 {
-	PointNoise noise(50, seed);
+	PointNoise noise(100, seed);
 	//noise.setBias(1.0f);
-
 	map.set(noise, &PointNoise::worley);
 
-	// Create the gradient grid
-	//GradientNoise base(8, 8, seed);
-
-	// Apply the noise
+	//GradientNoise base(10, 10, seed);
 	//map.set(base, &GradientNoise::perlin);
+
+	//GridNoise noise(10, 10, seed);
+	//map.set(noise, &GridNoise::worley);
 }
 
 void randomGenerator(Heightmap& map, unsigned seed, float min, float max, unsigned frequency, unsigned octaves, float persistence)

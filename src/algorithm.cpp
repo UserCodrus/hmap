@@ -438,33 +438,29 @@ PointNoise::PointNoise(unsigned num_points, unsigned seed)
 	tree.build(point);
 }
 
-/// TEMPORARY ///
-/// Function for finding the nearest point
-Vector2 TEMPNearest(const std::vector<Vector2>& data, Vector2 loc)
+Vector2 PointNoise::getNearest(Vector2 location) const
 {
-	Vector2 nearest = data[0];
-	float shortest_dist = distance2D(loc, data[0]);
+	Vector2 nearest = point[0];
+	float shortest_dist = distance2D(location, point[0]);
 
-	for (size_t i = 1; i < data.size(); ++i)
+	for (size_t i = 1; i < point.size(); ++i)
 	{
-		float dist = distance2D(loc, data[i]);
+		float dist = distance2D(location, point[i]);
 		if (shortest_dist > dist)
 		{
 			shortest_dist = dist;
-			nearest = data[i];
+			nearest = point[i];
 		}
 	}
 
 	return nearest;
 }
-/// TEMPORARY ///
 
 float PointNoise::dot(float x, float y) const
 {
 	// Get the nearest neighbor to the current point
 	Vector2 loc(x, y);
-	Vector2 nearest = TEMPNearest(point, loc);
-	//Vector2 nearest = *tree.getNearest(loc);
+	Vector2 nearest = getNearest(loc);
 
 	// Calculate the noise value based on distance
 	float value = 1.0f - distance2D(loc, nearest) / bias;
@@ -476,8 +472,8 @@ float PointNoise::worley(float x, float y) const
 {
 	// Get the nearest neighbor to the current point
 	Vector2 loc(x, y);
-	Vector2 nearest = TEMPNearest(point, loc);
-	//Vector2 nearest = *tree.getNearest(loc);
+	Vector2 nearest = getNearest(loc);
+	//Vector2 nearest = *tree.nearest(loc);
 
 	// Calculate the noise value based on distance
 	float value = sqrt(distance2D(loc, nearest)) / bias - 1.0f;

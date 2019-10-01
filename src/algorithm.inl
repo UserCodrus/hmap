@@ -73,12 +73,15 @@ KDNode2D<T>* KDTree2D<T>::addNode(std::vector<T>& data, typename std::vector<T>:
 }
 
 template <class T>
-const T* KDTree2D<T>::getNearest(const T& location) const
+const T* KDTree2D<T>::nearest(const T& location) const
 {
-	// The current node we are comparing
-	KDNode2D<T>* node = root;
-	// The current axis used for comparisons, true = x, false = y
-	bool axis = true;
+	// The list of nodes to evaluate
+	std::stack<KDNode2D<T>*> nodes;
+	// The axis to evaluate each node on, set to true for x axis or false for y axis
+	std::stack<bool> axes;
+
+	nodes.push(root);
+	axes.push(true);
 
 	// The smallest distance found so far
 	float nearest_distance = distance2D(*root->point, location);
@@ -86,78 +89,68 @@ const T* KDTree2D<T>::getNearest(const T& location) const
 	KDNode2D<T>* nearest_node = root;
 
 	// Get the nearest node
-	while (node != nullptr)
+	while (nodes.size() > 0)
 	{
-		// Determine if the current node is closer than the previous closest node
-		float distance = distance2D(*node->point, location);
-		if (distance < nearest_distance)
-		{
-			nearest_node = node;
-			nearest_distance = distance;
-		}
+		KDNode2D<T>* node = nodes.top();
 
-		if (axis)
+		if (node != nullptr)
 		{
-			// Compare the x coordinates of the node to the point
-			if (location.x < node->point->x)
+			// Determine if the current node is closer than the closest node found so far
+			float distance = distance2D(*node->point, location);
+			if (distance < nearest_distance)
 			{
-				// Select the left node
-				if (node->l != nullptr)
-				{
-					node = node->l;
-				}
-				else
-				{
-					break;
-				}
+				nearest_node = node;
+				nearest_distance = distance;
+			}
+
+			// Compare the point to the current node to determine the order to evaluate branches
+			float location_value, node_value;
+			bool axis = !axes.top();
+			if (axes.top())
+			{
+				location_value = location.x;
+				node_value = node->point->x;
 			}
 			else
 			{
-				// Select the right node
-				if (node->r != nullptr)
-				{
-					node = node->r;
-				}
-				else
-				{
-					break;
-				}
+				location_value = location.y;
+				node_value = node->point->y;
+			}
+
+			nodes.pop();
+			axes.pop();
+			if (location_value < node_value)
+			{
+				// Evaluate the left branch first
+				nodes.push(node->r);
+				axes.push(axis);
+				nodes.push(node->l);
+				axes.push(axis);
+			}
+			else
+			{
+				// Evaluate right branch first
+				nodes.push(node->l);
+				axes.push(axis);
+				nodes.push(node->r);
+				axes.push(axis);
 			}
 		}
 		else
 		{
-			// Compare the x coordinates of the node to the point
-			if (location.y < node->point->y)
-			{
-				// Select the left node
-				if (node->l != nullptr)
-				{
-					node = node->l;
-				}
-				else
-				{
-					break;
-				}
-			}
-			else
-			{
-				// Select the right node
-				if (node->r != nullptr)
-				{
-					node = node->r;
-				}
-				else
-				{
-					break;
-				}
-			}
+			// Ignore null nodes
+			nodes.pop();
+			axes.pop();
 		}
-
-		// Switch axis
-		axis = !axis;
 	}
 
 	return nearest_node->point;
+}
+
+template <class T>
+KDNode2D<T>* KDTree2D<T>::nearestNode(const T& location, KDNode2D<T>* root, float& nearest_distance, bool xaxis)
+{
+
 }
 
 template <class T>
