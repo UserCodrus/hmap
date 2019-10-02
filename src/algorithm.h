@@ -62,6 +62,8 @@ private:
 
 	// The tree's root node
 	KDNode2D<T>* root = nullptr;
+	// The maximum depth of the tree's node
+	unsigned depth = 0;
 };
 
 // The square of the distance between two vectors in the x and y dimensions
@@ -132,7 +134,7 @@ public:
 	//~PointNoise();
 
 	// Get the nearest point to a given location
-	Vector2 getNearest(Vector2 location) const;
+	virtual inline Vector2 getNearest(Vector2 location) const;
 
 	// Sample point noise at the given coordinates
 	virtual float dot(float x, float y) const;
@@ -163,7 +165,7 @@ public:
 	// Get the point in the provided grid cell
 	inline Vector2 getPoint(unsigned x, unsigned y) const;
 	// Get the nearest point to the provided coordinates
-	inline Vector2 getNearest(Vector2 location) const;
+	virtual inline Vector2 getNearest(Vector2 location) const;
 
 	// Sample point noise at the given coordinates
 	float dot(float x, float y) const override;

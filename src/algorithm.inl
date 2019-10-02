@@ -29,6 +29,7 @@ void KDTree2D<T>::build(std::vector<T>& data)
 
 	// Build a new tree
 	root = addNode(data, data.begin(), data.end());
+	depth = data.size();
 }
 
 template <class T>
@@ -76,12 +77,14 @@ template <class T>
 const T* KDTree2D<T>::nearest(const T& location) const
 {
 	// The list of nodes to evaluate
-	std::stack<KDNode2D<T>*> nodes;
-	// The axis to evaluate each node on, set to true for x axis or false for y axis
-	std::stack<bool> axes;
+	KDNode2D<T>** nodes = new KDNode2D<T>* [depth];
+	// The axis to evaluate on, set to true for x or false for y
+	bool* axes = new bool[depth];
+	// The current node being evaluated
+	int current = 0;
 
-	nodes.push(root);
-	axes.push(true);
+	nodes[0] = root;
+	axes[0] = true;
 
 	// The smallest distance found so far
 	float nearest_distance = distance2D(*root->point, location);
@@ -89,10 +92,9 @@ const T* KDTree2D<T>::nearest(const T& location) const
 	KDNode2D<T>* nearest_node = root;
 
 	// Get the nearest node
-	while (nodes.size() > 0)
+	while (current >= 0)
 	{
-		KDNode2D<T>* node = nodes.top();
-
+		KDNode2D<T>* node = nodes[current];
 		if (node != nullptr)
 		{
 			// Determine if the current node is closer than the closest node found so far
@@ -104,45 +106,59 @@ const T* KDTree2D<T>::nearest(const T& location) const
 			}
 
 			// Compare the point to the current node to determine the order to evaluate branches
-			float location_value, node_value;
-			bool axis = !axes.top();
-			if (axes.top())
+			bool axis = !axes[current];
+			if (axes[current])
 			{
-				location_value = location.x;
-				node_value = node->point->x;
-			}
-			else
-			{
-				location_value = location.y;
-				node_value = node->point->y;
-			}
+				if (location.x < node->point->x)
+				{
+					// Evaluate the left branch first
+					nodes[current] = node->r;
+					nodes[current + 1] = node->l;
 
-			nodes.pop();
-			axes.pop();
-			if (location_value < node_value)
-			{
-				// Evaluate the left branch first
-				nodes.push(node->r);
-				axes.push(axis);
-				nodes.push(node->l);
-				axes.push(axis);
+					axes[current] = axis;
+					axes[current + 1] = axis;
+				}
+				else
+				{
+					// Evaluate the right branch first
+					nodes[current] = node->l;
+					nodes[current + 1] = node->r;
+
+					axes[current] = axis;
+					axes[current + 1] = axis;
+				}
 			}
 			else
 			{
-				// Evaluate right branch first
-				nodes.push(node->l);
-				axes.push(axis);
-				nodes.push(node->r);
-				axes.push(axis);
+				if (location.y < node->point->y)
+				{
+					// Evaluate the left branch first
+					nodes[current] = node->r;
+					nodes[current + 1] = node->l;
+
+					axes[current] = axis;
+					axes[current + 1] = axis;
+				}
+				else
+				{
+					// Evaluate the right branch first
+					nodes[current] = node->l;
+					nodes[current + 1] = node->r;
+
+					axes[current] = axis;
+					axes[current + 1] = axis;
+				}
 			}
+			++current;
 		}
 		else
 		{
-			// Ignore null nodes
-			nodes.pop();
-			axes.pop();
+			--current;
 		}
 	}
+
+	delete[] nodes;
+	delete[] axes;
 
 	return nearest_node->point;
 }
