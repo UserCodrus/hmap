@@ -418,29 +418,40 @@ PlasmaNoise::PlasmaNoise(unsigned size, unsigned seed)
 /// Random point noise
 ///
 
-PointNoise::PointNoise(unsigned num_points, unsigned seed)
+PointNoise::PointNoise(unsigned x_bias, unsigned y_bias, unsigned num_points, unsigned seed)
 {
-	width = 100;
-	height = 100;
-	bias = 100.0f / (float)sqrt(num_points);
+	width = x_bias;
+	height = y_bias;
+	array_size = width * height;
 
 	// Generate points using random x and y values
 	std::default_random_engine rando(seed);
 	std::uniform_real_distribution<float> x_dist(0.0f, (float)width);
 	std::uniform_real_distribution<float> y_dist(0.0f, (float)height);
 
+	points = new std::vector<Vector2>[array_size];
 	for (unsigned i = 0; i < num_points; ++i)
 	{
-		point.push_back(Vector2(x_dist(rando), y_dist(rando)));
-	}
+		Vector2 point(x_dist(rando), y_dist(rando));
 
-	// Build a kd tree with the generated points
-	tree.build(point);
+		// Add the point to the point grid
+		int X = (int)point.x;
+		int Y = (int)point.y;
+		points[X + Y * width].push_back(point);
+	}
+}
+
+PointNoise::~PointNoise()
+{
+	if (points != nullptr)
+	{
+		delete[] points;
+	}
 }
 
 Vector2 PointNoise::getNearest(Vector2 location) const
 {
-	Vector2 nearest = point[0];
+	/*Vector2 nearest = point[0];
 	float shortest_dist = distance2D(location, point[0]);
 
 	for (size_t i = 1; i < point.size(); ++i)
@@ -450,6 +461,43 @@ Vector2 PointNoise::getNearest(Vector2 location) const
 		{
 			shortest_dist = dist;
 			nearest = point[i];
+		}
+	}
+
+	return nearest;*/
+
+	// Get the grid location to the top left of the current point
+	int X = (int)location.x - 1;
+	int Y = (int)location.y - 1;
+
+	// The closest point found so far
+	Vector2 nearest(0.0f, 0.0f);
+	// The distance to the closest point
+	float nearest_distance = (float)width;
+
+	// Check each grid cell surrounding the cell containing to current point
+	for (unsigned y = 0; y < 3; ++y)
+	{
+		long offset = (Y + y) * width;
+		for (unsigned x = 0; x < 3; ++x)
+		{
+			// Get the cell's location in the points array
+			long cell = (X + x) + offset;
+			if (cell > -1 && cell < (long)array_size)
+			{
+				// Check each point in the cell
+				std::vector<Vector2>* point_data = &points[cell];
+				for (unsigned i = 0; i < point_data->size(); ++i)
+				{
+					// Check the distance to the point
+					float dist = distance2D(location, point_data->at(i));
+					if (dist < nearest_distance)
+					{
+						nearest_distance = dist;
+						nearest = point_data->at(i);
+					}
+				}
+			}
 		}
 	}
 
@@ -463,7 +511,7 @@ float PointNoise::dot(float x, float y) const
 	Vector2 nearest = getNearest(loc);
 
 	// Calculate the noise value based on distance
-	float value = 1.0f - distance2D(loc, nearest) / bias;
+	float value = 1.0f - sqrt(distance2D(loc, nearest)) * 4;
 
 	return std::max(-1.0f, value);
 }
@@ -473,31 +521,24 @@ float PointNoise::worley(float x, float y) const
 	// Get the nearest neighbor to the current point
 	Vector2 loc(x, y);
 	Vector2 nearest = getNearest(loc);
-	//Vector2 nearest = *tree.nearest(loc);
 
 	// Calculate the noise value based on distance
-	float value = sqrt(distance2D(loc, nearest)) / bias - 1.0f;
+	float value = sqrt(distance2D(loc, nearest)) * 2 - 1.0f;
 
 	return std::min(1.0f, value);
-}
-
-void PointNoise::setBias(float value)
-{
-	bias = value;
 }
 
 GridNoise::GridNoise(unsigned _width, unsigned _height, unsigned seed)
 {
 	width = _width;
 	height = _height;
-	num_points = width * height;
-	bias = 1.0f;
+	array_size = width * height;
 
 	// Generate points at random locations within a unit grid
 	std::default_random_engine rando(seed);
 	std::uniform_real_distribution<float> dist(0.0f, 1.0f);
 
-	points = new Vector2[num_points];
+	points = new Vector2[array_size];
 	for (unsigned y = 0; y < height; ++y)
 	{
 		for (unsigned x = 0; x < width; ++x)
@@ -541,7 +582,7 @@ inline Vector2 GridNoise::getNearest(Vector2 location) const
 		{
 			// Get the cell's location in the point array
 			long cell = (X + x) + offset;
-			if (cell > -1 && cell < (long)num_points)
+			if (cell > -1 && cell < (long)array_size)
 			{
 				// Check the distance to the point
 				float dist = distance2D(location, points[cell]);
@@ -564,7 +605,7 @@ float GridNoise::dot(float x, float y) const
 	Vector2 nearest = getNearest(loc);
 
 	// Calculate the noise value based on distance
-	float value = 1.0f - distance2D(loc, nearest) / bias;
+	float value = 1.0f - sqrt(distance2D(loc, nearest)) * 4;
 
 	return std::max(-1.0f, value);
 }
@@ -576,7 +617,7 @@ float GridNoise::worley(float x, float y) const
 	Vector2 nearest = getNearest(loc);
 
 	// Calculate the noise value based on distance
-	float value = distance2D(loc, nearest) / bias - 1.0f;
+	float value = distance2D(loc, nearest) - 1.0f;
 
 	return std::min(1.0f, value);
 }

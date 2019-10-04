@@ -5,8 +5,7 @@
 
 void defaultGenerator(Heightmap& map, unsigned seed, float min, float max)
 {
-	PointNoise noise(100, seed);
-	//noise.setBias(1.0f);
+	PointNoise noise(5, 5, 100, seed);
 	map.set(noise, &PointNoise::worley);
 
 	//GradientNoise base(10, 10, seed);
