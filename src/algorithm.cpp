@@ -81,6 +81,16 @@ GradientNoise::~GradientNoise()
 	}
 }
 
+float GradientNoise::scaleWidth(unsigned sample_width) const
+{
+	return (float)(width - 1) / sample_width;
+}
+
+float GradientNoise::scaleHeight(unsigned sample_height) const
+{
+	return (float)(height - 1) / sample_height;
+}
+
 Vector2 GradientNoise::getGradient(unsigned x, unsigned y) const
 {
 	return gradient[y * width + x];
@@ -141,6 +151,16 @@ ValueNoise::~ValueNoise()
 	{
 		delete[] value;
 	}
+}
+
+float ValueNoise::scaleWidth(unsigned sample_width) const
+{
+	return (float)(width - 1) / sample_width;
+}
+
+float ValueNoise::scaleHeight(unsigned sample_height) const
+{
+	return (float)(height - 1) / sample_height;
 }
 
 float ValueNoise::getValue(unsigned x, unsigned y) const
@@ -447,6 +467,16 @@ PointNoise::~PointNoise()
 	{
 		delete[] points;
 	}
+}
+
+float PointNoise::scaleWidth(unsigned sample_width) const
+{
+	return (float)width / sample_width;
+}
+
+float PointNoise::scaleHeight(unsigned sample_height) const
+{
+	return (float)height / sample_height;
 }
 
 Vector2 PointNoise::getNearest(Vector2 location) const

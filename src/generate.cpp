@@ -11,6 +11,9 @@ void defaultGenerator(Heightmap& map, unsigned seed, float min, float max)
 	//GradientNoise base(10, 10, seed);
 	//map.set(base, &GradientNoise::perlin);
 
+	//ValueNoise noise(10, 10, seed);
+	//map.set(noise, &ValueNoise::cubic);
+
 	//GridNoise noise(10, 10, seed);
 	//map.set(noise, &GridNoise::worley);
 }
