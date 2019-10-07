@@ -1,19 +1,29 @@
-#include "heightmap.h"
+#include "generate.h"
 #include "algorithm.h"
 
-#include <limits>
+#include <iostream>
 
-void Heightmap::perlinOctaves(unsigned seed, float min, float max, unsigned grid_size, unsigned octaves, float persistence)
+void defaultGenerator(Heightmap& map, unsigned seed, float min, float max)
 {
-	// Create the gradient grid
-	GradientGrid grad(grid_size, grid_size, seed);
-	//unsigned width = map.getWidthX();
-	//unsigned height = map.getWidthY();
+	PointNoise noise(5, 5, 100, seed);
+	map.set(noise, &PointNoise::worley);
 
+	//GradientNoise base(10, 10, seed);
+	//map.set(base, &GradientNoise::perlin);
+
+	//ValueNoise noise(10, 10, seed);
+	//map.set(noise, &ValueNoise::cubic);
+
+	//GridNoise noise(10, 10, seed);
+	//map.set(noise, &GridNoise::worley);
+}
+
+void randomGenerator(Heightmap& map, unsigned seed, float min, float max, unsigned frequency, unsigned octaves, float persistence)
+{
 	// Check input values
-	if (grid_size < 2)
+	if (frequency < 2)
 	{
-		grid_size = 2;
+		frequency = 2;
 	}
 	if (octaves < 1)
 	{
@@ -28,105 +38,89 @@ void Heightmap::perlinOctaves(unsigned seed, float min, float max, unsigned grid
 		persistence = 1.0f;
 	}
 
-	// Get the limits of the heightmap
-	float bottom = min * std::numeric_limits<hdata>::max();
-	float delta = (max - min) * std::numeric_limits<hdata>::max();
-
-	// Apply noise
-	for (unsigned y = 0; y < width_y; ++y)
+	float amplitude = 1.0f;
+	float total_amplitude = 0.0f;
+	for (unsigned i = 1; i <= octaves; ++i)
 	{
-		for (unsigned x = 0; x < width_x; ++x)
-		{
-			// Generate multiple layers of noise
-			float noise = 0.0f;
-			float amplitude = 1.0f;
-			float total_amplitude = 0.0f;
+		// Create the noise
+		ValueNoise noise(frequency * i, frequency * i, seed);
 
-			// Set the frequency so that the map coordinates will never be outside the grid
-			float fx = (1.0f / (float)pow(2, octaves - 1)) * ((float)(grid_size - 1) / (width_x + 2));
-			float fy = (1.0f / (float)pow(2, octaves - 1)) * ((float)(grid_size - 1) / (width_y + 2));
-			
-			for (unsigned o = 0; o < octaves; ++o)
-			{
-				noise += grad.perlin((x + 1) * fx, (y + 1) * fy) * amplitude;
-				total_amplitude += amplitude;
-				amplitude *= persistence;
-				fx *= 2;
-				fy *= 2;
-			}
+		// Sample the noise to the heightmap
+		map.add(noise, &ValueNoise::cubic, amplitude);
 
-			noise = (noise / total_amplitude + 1.0f) * 0.5f;
-			setHeight(x, y, (hdata)(noise * delta + bottom));
-		}
+		// Adjust the amplitude and the seed
+		total_amplitude += amplitude;
+		amplitude *= persistence;
+		++seed;
 	}
+
+	// Get the limits of the heightmap
+	float delta = (max - min) / 2.0f;
+	float bottom = min + delta;
+
+	// Adjust the map to normalize the amplitude and fit within the specified limits
+	map.multiply(delta / total_amplitude);
+	map.add(bottom);
 }
 
-void Heightmap::perlinNotch(unsigned seed, float min, float max, unsigned base_frequency, unsigned detail_frequency, float detail_level)
+void plasmaGenerator(Heightmap& map, unsigned seed, float min, float max, unsigned scale)
+{
+	// Generate noise
+	PlasmaNoise noise(scale, seed);
+
+	// Apply noise
+	map.set<PlasmaNoise>(noise, &PlasmaNoise::cubic);
+
+	// Get the limits of the heightmap
+	float delta = (max - min) / 2.0f;
+	float bottom = min + delta;
+
+	// Scale the noise to fit within the specified limits
+	map.multiply(delta);
+	map.add(bottom);
+}
+
+void perlinGenerator(Heightmap& map, unsigned seed, float min, float max, unsigned frequency, unsigned octaves, float persistence)
 {
 	// Check input values
-	if (base_frequency < 1)
+	if (frequency < 2)
 	{
-		base_frequency = 1;
+		frequency = 2;
 	}
-	if (detail_frequency < 1)
+	if (octaves < 1)
 	{
-		detail_frequency = 1;
+		octaves = 1;
 	}
-	if (detail_level < 0.0f)
+	if (persistence < 0.0f)
 	{
-		detail_level = 0.0f;
+		persistence = 0.0f;
 	}
-	else if (detail_level > 1.0f)
+	else if (persistence > 1.0f)
 	{
-		detail_level = 1.0f;
+		persistence = 1.0f;
 	}
-	
-	// Create the gradient grid
-	GradientGrid base(base_frequency + 1, base_frequency + 1, seed);
-	GradientGrid mod(detail_frequency + 1, detail_frequency + 1, ++seed);
-	//unsigned width = map.getWidthX();
-	//unsigned height = map.getWidthY();
 
-	// Reduce the frequency of the noise a little so heightmap coordinates stay inside the grid
-	float fx_base = (float)(base.getWidth() - 1) / (width_x + 2);
-	float fy_base = (float)(base.getHeight() - 1) / (width_y + 2);
-	float fx_mod = (float)(mod.getWidth() - 1) / (width_x + 2);
-	float fy_mod = (float)(mod.getHeight() - 1) / (width_y + 2);
+	float amplitude = 1.0f;
+	float total_amplitude = 0.0f;
+	for (unsigned i = 1; i <= octaves; ++i)
+	{
+		// Create the noise
+		GradientNoise noise(frequency * i, frequency * i, seed);
 
-	// Calculate the value needed to normalize the noise
-	float normalize = 0.5f / (1.0f + detail_level);
+		// Sample the noise to the heightmap
+		map.add(noise, &GradientNoise::perlin, amplitude);
+		
+		// Adjust the amplitude and the seed
+		total_amplitude += amplitude;
+		amplitude *= persistence;
+		++seed;
+	}
 
 	// Get the limits of the heightmap
-	float bottom = min * std::numeric_limits<hdata>::max();
-	float delta = (max - min) * std::numeric_limits<hdata>::max();
+	float delta = (max - min) / 2.0f;
+	float bottom = min + delta;
 
-	// Apply noise
-	float elevation, detail;
-	for (unsigned y = 0; y < width_y; ++y)
-	{
-		for (unsigned x = 0; x < width_x; ++x)
-		{
-			elevation = base.perlin((x + 1) * fx_base, (y + 1) * fy_base);
-			detail = mod.perlin((x + 1) * fx_mod, (y + 1) * fy_mod);
-
-			setHeight(x, y, (hdata)(((elevation + elevation * detail * detail_level) * normalize + 0.5f) * delta + bottom));
-		}
-	}
-}
-
-void testperlin(Heightmap& map, unsigned seed)
-{
-	// Create the gradient grid
-	std::vector<int> p;
-	permutation(p, 256, seed);
-
-	// Apply noise
-	for (unsigned y = 0; y < map.getWidthY(); ++y)
-	{
-		for (unsigned x = 0; x < map.getWidthX(); ++x)
-		{
-			float noise = (perlin(p.data(), x / 64.0f + 1, y / 64.0f + 1) + 1.0f) * 0.5f;
-			map.setHeight(x, y, (uint16_t)(noise * 0xFFFF));
-		}
-	}
+	// Adjust the map to normalize the amplitude and fit within the specified limits
+	map.multiply(delta / total_amplitude);
+	map.add(bottom);
 }
