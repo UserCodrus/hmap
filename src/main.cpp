@@ -221,7 +221,7 @@ int main(int argc, char** argv)
 		{
 			if (generator_data.size() > 2)
 			{
-				randomGenerator(map, seed, min_height, max_height, (unsigned)generator_data[0], (unsigned)generator_data[1], generator_data[2]);
+				MapGenerator::layeredWhiteNoise(map, seed, min_height, max_height, (unsigned)generator_data[0], (unsigned)generator_data[1], generator_data[2]);
 				done = true;
 			}
 		}
@@ -229,7 +229,7 @@ int main(int argc, char** argv)
 		{
 			if (generator_data.size() > 0)
 			{
-				plasmaGenerator(map, seed, min_height, max_height, (unsigned)generator_data[0]);
+				MapGenerator::plasma(map, seed, min_height, max_height, (unsigned)generator_data[0]);
 				done = true;
 			}
 		}
@@ -237,7 +237,7 @@ int main(int argc, char** argv)
 		{
 			if (generator_data.size() > 2)
 			{
-				perlinGenerator(map, seed, min_height, max_height, (unsigned)generator_data[0], (unsigned)generator_data[1], generator_data[2]);
+				MapGenerator::layeredPerlin(map, seed, min_height, max_height, (unsigned)generator_data[0], (unsigned)generator_data[1], generator_data[2]);
 				done = true;
 			}
 		}
@@ -245,7 +245,7 @@ int main(int argc, char** argv)
 
 	if (!done)
 	{
-		defaultGenerator(map, seed, min_height, max_height);
+		MapGenerator::defaultGenerator(map, seed, min_height, max_height);
 	}
 
 	// Measure the time taken to create the heightmap

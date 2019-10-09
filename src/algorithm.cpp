@@ -73,6 +73,14 @@ GradientNoise::GradientNoise(unsigned _width, unsigned _height, unsigned seed)
 	}
 }
 
+GradientNoise::GradientNoise(const GradientNoise& copy)
+{
+	width = copy.width;
+	height = copy.height;
+	gradient = new Vector2[width * height];
+	memcpy(gradient, copy.gradient, width * height * sizeof(Vector2));
+}
+
 GradientNoise::~GradientNoise()
 {
 	if (gradient != nullptr)
@@ -81,14 +89,10 @@ GradientNoise::~GradientNoise()
 	}
 }
 
-float GradientNoise::scaleWidth(unsigned sample_width) const
+void GradientNoise::scale(unsigned sample_width, unsigned sample_height)
 {
-	return (float)(width - 1) / sample_width;
-}
-
-float GradientNoise::scaleHeight(unsigned sample_height) const
-{
-	return (float)(height - 1) / sample_height;
+	scale_x = (float)(width - 1) / sample_width;
+	scale_y = (float)(height - 1) / sample_height;
 }
 
 Vector2 GradientNoise::getGradient(unsigned x, unsigned y) const
@@ -98,6 +102,10 @@ Vector2 GradientNoise::getGradient(unsigned x, unsigned y) const
 
 float GradientNoise::perlin(float x, float y) const
 {
+	// Scale noise values
+	x *= scale_x;
+	y *= scale_y;
+
 	// Get the coordinates of the grid cell containing x, y
 	int X = (int)x;
 	int Y = (int)y;
@@ -145,6 +153,14 @@ ValueNoise::ValueNoise(unsigned _width, unsigned _height, unsigned seed)
 	}
 }
 
+ValueNoise::ValueNoise(const ValueNoise& copy)
+{
+	width = copy.width;
+	height = copy.height;
+	value = new float[width * height];
+	memcpy(value, copy.value, width * height * sizeof(float));
+}
+
 ValueNoise::~ValueNoise()
 {
 	if (value != nullptr)
@@ -153,14 +169,10 @@ ValueNoise::~ValueNoise()
 	}
 }
 
-float ValueNoise::scaleWidth(unsigned sample_width) const
+void ValueNoise::scale(unsigned sample_width, unsigned sample_height)
 {
-	return (float)(width - 1) / sample_width;
-}
-
-float ValueNoise::scaleHeight(unsigned sample_height) const
-{
-	return (float)(height - 1) / sample_height;
+	scale_x = (float)(width - 1) / sample_width;
+	scale_y = (float)(height - 1) / sample_height;
 }
 
 float ValueNoise::getValue(unsigned x, unsigned y) const
@@ -170,6 +182,10 @@ float ValueNoise::getValue(unsigned x, unsigned y) const
 
 float ValueNoise::linear(float x, float y) const
 {
+	// Scale noise values
+	x *= scale_x;
+	y *= scale_y;
+
 	// Get the coordinates of the grid cell containing x, y
 	int X = (int)x;
 	int Y = (int)y;
@@ -187,6 +203,10 @@ float ValueNoise::linear(float x, float y) const
 
 float ValueNoise::cosine(float x, float y) const
 {
+	// Scale noise values
+	x *= scale_x;
+	y *= scale_y;
+
 	// Get the coordinates of the grid cell containing x, y
 	int X = (int)x;
 	int Y = (int)y;
@@ -204,6 +224,10 @@ float ValueNoise::cosine(float x, float y) const
 
 float ValueNoise::cubic(float x, float y) const
 {
+	// Scale noise values
+	x *= scale_x;
+	y *= scale_y;
+
 	// Get the coordinates of the grid cell containing x, y
 	int X = (int)x;
 	int Y = (int)y;
@@ -434,6 +458,14 @@ PlasmaNoise::PlasmaNoise(unsigned size, unsigned seed)
 	}
 }
 
+PlasmaNoise::PlasmaNoise(const PlasmaNoise& copy)
+{
+	width = copy.width;
+	height = copy.height;
+	value = new float[width * height];
+	memcpy(value, copy.value, width * height * sizeof(float));
+}
+
 ///
 /// Random point noise
 ///
@@ -461,6 +493,22 @@ PointNoise::PointNoise(unsigned x_bias, unsigned y_bias, unsigned num_points, un
 	}
 }
 
+PointNoise::PointNoise(const PointNoise& copy)
+{
+	width = copy.width;
+	height = copy.height;
+	array_size = copy.array_size;
+
+	points = new std::vector<Vector2>[array_size];
+	for (unsigned i = 0; i < array_size; ++i)
+	{
+		for (unsigned j = 0; j < copy.points[i].size(); ++j)
+		{
+			points[i].push_back(copy.points[i][j]);
+		}
+	}
+}
+
 PointNoise::~PointNoise()
 {
 	if (points != nullptr)
@@ -469,33 +517,14 @@ PointNoise::~PointNoise()
 	}
 }
 
-float PointNoise::scaleWidth(unsigned sample_width) const
+void PointNoise::scale(unsigned sample_width, unsigned sample_height)
 {
-	return (float)width / sample_width;
-}
-
-float PointNoise::scaleHeight(unsigned sample_height) const
-{
-	return (float)height / sample_height;
+	scale_x = (float)width / sample_width;
+	scale_y = (float)height / sample_height;
 }
 
 Vector2 PointNoise::getNearest(Vector2 location) const
 {
-	/*Vector2 nearest = point[0];
-	float shortest_dist = distance2D(location, point[0]);
-
-	for (size_t i = 1; i < point.size(); ++i)
-	{
-		float dist = distance2D(location, point[i]);
-		if (shortest_dist > dist)
-		{
-			shortest_dist = dist;
-			nearest = point[i];
-		}
-	}
-
-	return nearest;*/
-
 	// Get the grid location to the top left of the current point
 	int X = (int)location.x - 1;
 	int Y = (int)location.y - 1;
@@ -536,6 +565,10 @@ Vector2 PointNoise::getNearest(Vector2 location) const
 
 float PointNoise::dot(float x, float y) const
 {
+	// Scale noise values
+	x *= scale_x;
+	y *= scale_y;
+
 	// Get the nearest neighbor to the current point
 	Vector2 loc(x, y);
 	Vector2 nearest = getNearest(loc);
@@ -548,6 +581,10 @@ float PointNoise::dot(float x, float y) const
 
 float PointNoise::worley(float x, float y) const
 {
+	// Scale noise values
+	x *= scale_x;
+	y *= scale_y;
+
 	// Get the nearest neighbor to the current point
 	Vector2 loc(x, y);
 	Vector2 nearest = getNearest(loc);
@@ -578,6 +615,15 @@ GridNoise::GridNoise(unsigned _width, unsigned _height, unsigned seed)
 			points[loc].y = y + dist(rando);
 		}
 	}
+}
+
+GridNoise::GridNoise(const GridNoise& copy)
+{
+	width = copy.width;
+	height = copy.height;
+	array_size = copy.array_size;
+	points = new Vector2[array_size];
+	memcpy(points, copy.points, array_size * sizeof(Vector2));
 }
 
 GridNoise::~GridNoise()
@@ -630,6 +676,10 @@ inline Vector2 GridNoise::getNearest(Vector2 location) const
 
 float GridNoise::dot(float x, float y) const
 {
+	// Scale noise values
+	x *= scale_x;
+	y *= scale_y;
+
 	// Get the nearest neighbor to the current point
 	Vector2 loc(x, y);
 	Vector2 nearest = getNearest(loc);
@@ -642,6 +692,10 @@ float GridNoise::dot(float x, float y) const
 
 float GridNoise::worley(float x, float y) const
 {
+	// Scale noise values
+	x *= scale_x;
+	y *= scale_y;
+
 	// Get the nearest neighbor to the current point
 	Vector2 loc(x, y);
 	Vector2 nearest = getNearest(loc);
