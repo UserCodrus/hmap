@@ -27,13 +27,7 @@ public:
 
 	// Set the heightmap to match a noise sample
 	template <class T>
-	void set(const T& noise, float (T::* sample)(float, float) const, float scale = 1.0f);
-	// Add a noise sample to the height of the heightmap
-	template <class T>
-	void add(const T& noise, float (T::*sample)(float, float) const, float scale = 1.0f);
-	// Multiply the heightmap by a noise sample
-	template <class T>
-	void multiply(const T& noise, float (T::* sample)(float, float) const, float scale = 1.0f);
+	void sample(T& noise, float (T::* sample)(float, float) const, float scale = 1.0f);
 
 	// Set the contents of the heightmap to match another heightmap
 	void set(const Heightmap& in);

@@ -8,7 +8,7 @@ Heightmap::Heightmap()
 Heightmap::Heightmap(const Heightmap& _copy)
 {
 	resize(_copy.width_x , _copy.width_y);
-	memcpy(data, _copy.data, width_x * width_y);
+	memcpy(data, _copy.data, width_x * width_y * sizeof(hdata));
 }
 
 Heightmap::Heightmap(unsigned size_x, unsigned size_y)
