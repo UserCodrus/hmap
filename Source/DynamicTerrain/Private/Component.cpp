@@ -80,7 +80,7 @@ uint32 ComponentBuilder::Run()
 			{
 				for (uint16 x = 0; x < component_width; ++x)
 				{
-					data.vertices.Add(FVector(x - world_x, world_y - y, ((float)heightmap->getHeight(map_x + x, map_y + y) / HMAPMAX - 0.5f) * total_height));
+					data.vertices.Add(FVector(x - world_x, world_y - y, heightmap->getHeight(map_x + x, map_y + y) * total_height));
 				}
 			}
 
