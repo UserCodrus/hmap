@@ -28,6 +28,7 @@ void MapGenerator::plasma(Heightmap& map, unsigned seed, float min, float max, u
 
 	// Generate noise
 	PlasmaNoise noise(scale, seed);
+	noise.scale(map.getWidthX(), map.getWidthY());
 
 	// Apply noise
 	map.sample<PlasmaNoise>(noise, &PlasmaNoise::cubic);
