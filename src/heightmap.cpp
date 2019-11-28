@@ -1,5 +1,65 @@
 #include "heightmap.h"
 
+Vectormap::Vectormap()
+{
+
+}
+
+Vectormap::Vectormap(const Vectormap& _copy)
+{
+	resize(_copy.width_x, _copy.width_y);
+	memcpy(data, _copy.data, width_x * width_y * sizeof(hdata));
+}
+
+Vectormap::Vectormap(unsigned x, unsigned y)
+{
+	resize(x, y);
+}
+
+Vectormap::~Vectormap()
+{
+	if (data != nullptr)
+	{
+		delete[] data;
+	}
+}
+
+unsigned Vectormap::getWidthX() const
+{
+	return width_x;
+}
+
+unsigned Vectormap::getWidthY() const
+{
+	return width_y;
+}
+
+Vector3 Vectormap::getVector(unsigned x, unsigned y) const
+{
+	return data[y * width_x + x];
+}
+
+void Vectormap::setVector(unsigned x, unsigned y, Vector3 value)
+{
+	data[y * width_x + x] = value;
+}
+
+void Vectormap::resize(unsigned x, unsigned y)
+{
+	width_x = x;
+	width_y = y;
+
+	// Delete existing data if necessary
+	if (data != nullptr)
+	{
+		delete[] data;
+	}
+
+	// Create the data buffer
+	unsigned size = width_x * width_y;
+	data = new Vector3[size];
+}
+
 Heightmap::Heightmap()
 {
 
@@ -61,22 +121,174 @@ unsigned Heightmap::getSize() const
 
 hdata Heightmap::getHeight(unsigned x, unsigned y) const
 {
-	if (x >= width_x || y >= width_y)
-	{
-		throw new std::exception("Array out of bounds in heightmap");
-	}
-
 	return data[y * width_x + x];
 }
 
 void Heightmap::setHeight(unsigned x, unsigned y, hdata value)
 {
-	if (x >= width_x || y >= width_y)
+	data[y * width_x + x] = value;
+}
+
+void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
+{
+	// Make sure the normal map is the same size as the heightmap
+	if (normal.getWidthX() != width_x || normal.getWidthY() != width_y)
 	{
-		throw new std::exception("Array out of bounds in heightmap");
+		normal.resize(width_x, width_y);
 	}
 
-	data[y * width_x + x] = value;
+	// Calculate normals
+	for (unsigned y = 1; y < width_y - 1; ++y)
+	{
+		for (unsigned x = 1; x < width_x - 1; ++x)
+		{
+			float s01 = getHeight(x - 1, y);
+			float s21 = getHeight(x + 1, y);
+			float s10 = getHeight(x, y - 1);
+			float s12 = getHeight(x, y + 1);
+
+			// Get tangents in the x and y directions
+			Vector3 vx(2.0f, 0, s21 - s01);
+			Vector3 vy(0, 2.0f, s12 - s10);
+
+			// Calculate the cross product of the two normals
+			vx = normalize(vx);
+			vy = normalize(vy);
+			normal.setVector(x, y, cross(vx, vy));
+			tangent.setVector(x, y, vx);
+		}
+	}
+
+	// Calculate normals on the edges
+	for (unsigned x = 1; x < width_x - 1; ++x)
+	{
+		// Top edge
+		float s01 = getHeight(x - 1, 0);
+		float s21 = getHeight(x + 1, 0);
+		float s10 = getHeight(x, 0);
+		float s12 = getHeight(x, 1);
+
+		Vector3 vx(2.0f, 0, s21 - s01);
+		Vector3 vy(0, 2.0f, s12 - s10);
+
+		vx = normalize(vx);
+		vy = normalize(vy);
+		normal.setVector(x, 0, cross(vx, vy));
+		tangent.setVector(x, 0, vx);
+
+		// Bottom edge
+		unsigned y = width_y - 1;
+		s01 = getHeight(x - 1, y);
+		s21 = getHeight(x + 1, y);
+		s10 = getHeight(x, y - 1);
+		s12 = getHeight(x, y);
+
+		vx = { 2.0f, 0, s21 - s01 };
+		vy = { 0, 2.0f, s12 - s10 };
+
+		vx = normalize(vx);
+		vy = normalize(vy);
+		normal.setVector(x, y, cross(vx, vy));
+		tangent.setVector(x, y, vx);
+	}
+
+	for (unsigned y = 1; y < width_y - 1; ++y)
+	{
+		// Left edge
+		float s01 = getHeight(0, y);
+		float s21 = getHeight(1, y);
+		float s10 = getHeight(0, y - 1);
+		float s12 = getHeight(0, y + 1);
+
+		Vector3 vx(2.0f, 0, s21 - s01);
+		Vector3 vy(0, 2.0f, s12 - s10);
+
+		vx = normalize(vx);
+		vy = normalize(vy);
+		normal.setVector(0, y, cross(vx, vy));
+		tangent.setVector(0, y, vx);
+
+		// Right edge
+		unsigned x = width_x - 1;
+		s01 = getHeight(x - 1, y);
+		s21 = getHeight(x, y);
+		s10 = getHeight(x, y - 1);
+		s12 = getHeight(x, y + 1);
+
+		vx = { 2.0f, 0, s21 - s01 };
+		vy = { 0, 2.0f, s12 - s10 };
+
+		vx = normalize(vx);
+		vy = normalize(vy);
+		normal.setVector(x, y, cross(vx, vy));
+		tangent.setVector(x, y, vx);
+	}
+
+	// Get the corners last
+
+	// Top left corner
+	unsigned x = 0;
+	unsigned y = 0;
+	float s01 = getHeight(x, y);
+	float s21 = getHeight(x + 1, y);
+	float s10 = getHeight(x, y);
+	float s12 = getHeight(x, y + 1);
+
+	Vector3 vx(2.0f, 0, s21 - s01);
+	Vector3 vy(0, 2.0f, s12 - s10);
+
+	vx = normalize(vx);
+	vy = normalize(vy);
+	normal.setVector(x, y, cross(vx, vy));
+	tangent.setVector(x, y, vx);
+
+	// Top right corner
+	x = width_x - 1;
+	y = 0;
+	s01 = getHeight(x - 1, y);
+	s21 = getHeight(x, y);
+	s10 = getHeight(x, y);
+	s12 = getHeight(x, y + 1);
+
+	vx = { 2.0f, 0, s21 - s01 };
+	vy = { 0, 2.0f, s12 - s10 };
+
+	vx = normalize(vx);
+	vy = normalize(vy);
+	normal.setVector(x, y, cross(vx, vy));
+	tangent.setVector(x, y, vx);
+
+	// Bottom left corner
+	x = 0;
+	y = width_y - 1;
+	s01 = getHeight(x, y);
+	s21 = getHeight(x + 1, y);
+	s10 = getHeight(x, y - 1);
+	s12 = getHeight(x, y);
+
+	vx = { 2.0f, 0, s21 - s01 };
+	vy = { 0, 2.0f, s12 - s10 };
+
+	vx = normalize(vx);
+	vy = normalize(vy);
+	normal.setVector(x, y, cross(vx, vy));
+	tangent.setVector(x, y, vx);
+
+	// Bottom right corner
+	x = width_x - 1;
+	y = width_y - 1;
+	s01 = getHeight(x - 1, y);
+	s21 = getHeight(x, y);
+	s10 = getHeight(x, y - 1);
+	s12 = getHeight(x, y);
+
+	vx = { 2.0f, 0, s21 - s01 };
+	vy = { 0, 2.0f, s12 - s10 };
+
+	vx = normalize(vx);
+	vy = normalize(vy);
+	normal.setVector(x, y, cross(vx, vy));
+	tangent.setVector(x, y, vx);
 }
 
 ///
