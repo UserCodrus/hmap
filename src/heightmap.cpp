@@ -131,10 +131,14 @@ void Heightmap::setHeight(unsigned x, unsigned y, hdata value)
 
 void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 {
-	// Make sure the normal map is the same size as the heightmap
+	// Make sure the normal and tangent vector maps are the same size as the heightmap
 	if (normal.getWidthX() != width_x || normal.getWidthY() != width_y)
 	{
 		normal.resize(width_x, width_y);
+	}
+	if (tangent.getWidthX() != width_x || tangent.getWidthY() != width_y)
+	{
+		tangent.resize(width_x, width_y);
 	}
 
 	// Calculate normals

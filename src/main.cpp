@@ -21,6 +21,8 @@ int main(int argc, char** argv)
 
 	string generator_name;			// The name of the generator being used
 	vector<float> generator_data;	// Data for the heightmap generator
+
+	bool gen_normals = false;		// Set to true to generate normals for the heightmap
 	
 	// Get the start time
 	auto t_start = Timer::now();
@@ -178,6 +180,11 @@ int main(int argc, char** argv)
 						}
 					}
 					break;
+
+				case 'N':
+				case 'n':
+					gen_normals = true;
+					break;
 				}
 			}
 		}
@@ -211,6 +218,7 @@ int main(int argc, char** argv)
 
 	// Create the heightmap
 	cout << "\nGenerating heightmap... ";
+	t_start = Timer::now();
 	Heightmap map(width, height);
 
 	bool done = false;
@@ -249,12 +257,27 @@ int main(int argc, char** argv)
 	}
 
 	// Measure the time taken to create the heightmap
-	auto t_gen = Timer::now();
-	chrono::duration<double> delta = t_gen - t_start;
+	auto t_now = Timer::now();
+	chrono::duration<double> delta = t_now - t_start;
 	cout << delta.count() << "s";
+
+	// Generate normals and tangents
+	if (gen_normals)
+	{
+		cout << "\nCalculating normals... ";
+		t_start = Timer::now();
+		Vectormap normals, tangents;
+		map.calculateNormals(normals, tangents);
+
+		// Measure the time taken to generate normals
+		t_now = Timer::now();
+		delta = t_now - t_start;
+		cout << delta.count() << "s";
+	}
 
 	// Load height data into a byte buffer
 	cout << "\nExporting heightmap... ";
+	t_start = Timer::now();
 	PixelBuffer image(map.getWidthX(), map.getWidthY(), sizeof(uint16_t));
 	for (unsigned y = 0; y < map.getWidthY(); ++y)
 	{
@@ -271,8 +294,8 @@ int main(int argc, char** argv)
 		image.save(fname);
 
 		// Measure the time taken to package the heightmap
-		auto t_pack = Timer::now();
-		delta = t_pack - t_gen;
+		t_now = Timer::now();
+		delta = t_now - t_start;
 		cout << delta.count() << "s";
 
 		cout << "\n\nHeightmap saved to " << fname << endl;
