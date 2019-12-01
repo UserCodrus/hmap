@@ -7,7 +7,7 @@
 
 void ComponentData::allocate(uint16 size, uint16 section_id)
 {
-	section = section_id;
+	//section = section_id;
 
 	// Empty all of the arrays
 	vertices.Empty();
@@ -61,6 +61,22 @@ uint32 ComponentBuilder::Run()
 		if (!idle)
 		{
 			// Build a component section if the thread is not idling
+			//uint16 size = (unsigned)component_width;
+			data.allocate((unsigned)component_width, 0);
+
+			// Empty all of the arrays
+			/*data.vertices.Empty();
+			data.triangles.Empty();
+			data.UV0.Empty();
+			data.normals.Empty();
+			data.tangents.Empty();
+
+			// Preallocate the arrays
+			data.vertices.Reserve(size * size);
+			data.triangles.Reserve((size - 1) * (size - 1) * 6);
+			data.UV0.Reserve(size * size);
+			data.normals.Reserve(size * size);
+			data.tangents.Reserve(size * size);*/
 
 			// The number of polygons in each component
 			uint16 polygons = component_width - 1;
@@ -150,7 +166,8 @@ void ComponentBuilder::Build(uint16 _component_x, uint16 _component_y, uint16 se
 	component_x = _component_x;
 	component_y = _component_y;
 
-	data.allocate((unsigned)component_width, section_number);
+	//data.allocate((unsigned)component_width, section_number);
+	data.section = section_number;
 
 	idle = false;
 }
