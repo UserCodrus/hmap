@@ -1,5 +1,7 @@
 #pragma once
 
+#include "data.h"
+
 #include <vector>
 #include <stack>
 #include <algorithm>
@@ -12,22 +14,6 @@ inline float corp(float t, float a, float b);
 inline float curp(float t, float a[4]);
 // Perlin smoothstep function
 inline float fade(float t);
-
-struct Vector2
-{
-	Vector2() : x(0.0f), y(0.0f) {};
-	Vector2(float _x, float _y) : x(_x), y(_y) {};
-
-	float x, y;
-};
-
-struct Vector3
-{
-	Vector3() : x(0.0f), y(0.0f), z(0.0f) {};
-	Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {};
-
-	float x, y, z;
-};
 
 // The square of the distance between two vectors in the x and y dimensions
 template <class T>
