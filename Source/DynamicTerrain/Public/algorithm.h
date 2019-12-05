@@ -47,7 +47,7 @@ class GradientNoise : public Noise
 public:
 	GradientNoise(unsigned _width, unsigned _height, unsigned seed);
 	GradientNoise(const GradientNoise& copy);
-	~GradientNoise();
+	virtual ~GradientNoise();
 
 	virtual void scale(unsigned sample_width, unsigned sample_height) override;
 
@@ -68,7 +68,7 @@ public:
 	ValueNoise() {};
 	ValueNoise(unsigned _width, unsigned _height, unsigned seed);
 	ValueNoise(const ValueNoise& copy);
-	~ValueNoise();
+	virtual ~ValueNoise();
 
 	virtual void scale(unsigned sample_width, unsigned sample_height) override;
 
@@ -101,7 +101,7 @@ public:
 	PointNoise() {};
 	PointNoise(unsigned x_bias, unsigned y_bias, unsigned points, unsigned seed);
 	PointNoise(const PointNoise& copy);
-	~PointNoise();
+	virtual ~PointNoise();
 
 	virtual void scale(unsigned sample_width, unsigned sample_height) override;
 
@@ -127,7 +127,7 @@ class GridNoise : public PointNoise
 public:
 	GridNoise(unsigned _width, unsigned _height, unsigned seed);
 	GridNoise(const GridNoise& copy);
-	~GridNoise();
+	virtual ~GridNoise();
 
 	// Get the point in the provided grid cell
 	inline Vector2 getPoint(unsigned x, unsigned y) const;
