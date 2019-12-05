@@ -24,9 +24,11 @@ void ComponentData::allocate(uint16 size, uint16 section_id)
 	tangents.Reserve(size * size);
 }
 
-ComponentBuilder::ComponentBuilder(Heightmap* map, float map_height, uint16 component_size)
+ComponentBuilder::ComponentBuilder(Heightmap* map, Vectormap* normal, Vectormap* tangent, float map_height, uint16 component_size)
 {
 	heightmap = map;
+	normalmap = normal;
+	tangentmap = tangent;
 	total_height = map_height;
 	component_width = component_size;
 
@@ -61,22 +63,7 @@ uint32 ComponentBuilder::Run()
 		if (!idle)
 		{
 			// Build a component section if the thread is not idling
-			//uint16 size = (unsigned)component_width;
 			data.allocate((unsigned)component_width, 0);
-
-			// Empty all of the arrays
-			/*data.vertices.Empty();
-			data.triangles.Empty();
-			data.UV0.Empty();
-			data.normals.Empty();
-			data.tangents.Empty();
-
-			// Preallocate the arrays
-			data.vertices.Reserve(size * size);
-			data.triangles.Reserve((size - 1) * (size - 1) * 6);
-			data.UV0.Reserve(size * size);
-			data.normals.Reserve(size * size);
-			data.tangents.Reserve(size * size);*/
 
 			// The number of polygons in each component
 			uint16 polygons = component_width - 1;
@@ -91,12 +78,24 @@ uint32 ComponentBuilder::Run()
 			uint16 map_x = component_x * polygons;
 			uint16 map_y = component_y * polygons;
 
-			// Create vertices
+			// Create vertex data
 			for (uint16 y = 0; y < component_width; ++y)
 			{
 				for (uint16 x = 0; x < component_width; ++x)
 				{
+					// Vertices
 					data.vertices.Add(FVector(x - world_x, world_y - y, heightmap->getHeight(map_x + x, map_y + y) * total_height));
+
+					// Normals
+					Vector3 vec = normalmap->getVector(map_x + x, map_y + y);
+					data.normals.Add(FVector(vec.x, vec.y, vec.z));
+
+					// Tangents
+					vec = tangentmap->getVector(map_x + x, map_y + y);
+					data.tangents.Add(FProcMeshTangent(vec.x, vec.y, vec.z));
+
+					// UVs
+					data.UV0.Add(FVector2D(x + map_x, y + map_y));
 				}
 			}
 
@@ -116,16 +115,16 @@ uint32 ComponentBuilder::Run()
 			}
 
 			// Create UVs
-			for (uint16 y = 0; y < component_width; ++y)
+			/*for (uint16 y = 0; y < component_width; ++y)
 			{
 				for (uint16 x = 0; x < component_width; ++x)
 				{
 					data.UV0.Add(FVector2D(x + map_x, y + map_y));
 				}
-			}
+			}*/
 
 			// Create normals and tangents
-			UKismetProceduralMeshLibrary::CalculateTangentsForMesh(data.vertices, data.triangles, data.UV0, data.normals, data.tangents);
+			//UKismetProceduralMeshLibrary::CalculateTangentsForMesh(data.vertices, data.triangles, data.UV0, data.normals, data.tangents);
 
 			idle = true;
 		}

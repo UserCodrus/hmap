@@ -21,7 +21,7 @@ struct ComponentData
 class ComponentBuilder : public FRunnable
 {
 public:
-	ComponentBuilder(Heightmap* map, float map_height, uint16 component_size);
+	ComponentBuilder(Heightmap* map, Vectormap* normal, Vectormap* tangent, float map_height, uint16 component_size);
 	~ComponentBuilder();
 
 	// FRunnable interface
@@ -40,6 +40,8 @@ public:
 
 private:
 	Heightmap* heightmap;					// The heightmap to draw data from
+	Vectormap* normalmap;					// The vectormap to draw normal data from
+	Vectormap* tangentmap;					// The vectormap to draw tangent data from
 
 	float total_height;						// The Heigth of the parent terrain
 	uint16 component_width;					// The ComponentSize of the parent terrain
