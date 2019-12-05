@@ -129,7 +129,7 @@ void Heightmap::setHeight(unsigned x, unsigned y, hdata value)
 	data[y * width_x + x] = value;
 }
 
-void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
+void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float scale)
 {
 	// Make sure the normal and tangent vector maps are the same size as the heightmap
 	if (normal.getWidthX() != width_x || normal.getWidthY() != width_y)
@@ -141,15 +141,28 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 		tangent.resize(width_x, width_y);
 	}
 
+	// Change the scaling factor
+	if (scale <= 0.0f)
+	{
+		if (width_x > width_y)
+		{
+			scale = width_y;
+		}
+		else
+		{
+			scale = width_x;
+		}
+	}
+
 	// Calculate normals
 	for (unsigned y = 1; y < width_y - 1; ++y)
 	{
 		for (unsigned x = 1; x < width_x - 1; ++x)
 		{
-			float s01 = getHeight(x - 1, y);
-			float s21 = getHeight(x + 1, y);
-			float s10 = getHeight(x, y - 1);
-			float s12 = getHeight(x, y + 1);
+			float s01 = getHeight(x - 1, y) * scale;
+			float s21 = getHeight(x + 1, y) * scale;
+			float s10 = getHeight(x, y - 1) * scale;
+			float s12 = getHeight(x, y + 1) * scale;
 
 			// Get tangents in the x and y directions
 			Vector3 vx(2.0f, 0, s21 - s01);
@@ -167,10 +180,10 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 	for (unsigned x = 1; x < width_x - 1; ++x)
 	{
 		// Top edge
-		float s01 = getHeight(x - 1, 0);
-		float s21 = getHeight(x + 1, 0);
-		float s10 = getHeight(x, 0);
-		float s12 = getHeight(x, 1);
+		float s01 = getHeight(x - 1, 0) * scale;
+		float s21 = getHeight(x + 1, 0) * scale;
+		float s10 = getHeight(x, 0) * scale;
+		float s12 = getHeight(x, 1) * scale;
 
 		Vector3 vx(2.0f, 0, s21 - s01);
 		Vector3 vy(0, 2.0f, s12 - s10);
@@ -182,10 +195,10 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 
 		// Bottom edge
 		unsigned y = width_y - 1;
-		s01 = getHeight(x - 1, y);
-		s21 = getHeight(x + 1, y);
-		s10 = getHeight(x, y - 1);
-		s12 = getHeight(x, y);
+		s01 = getHeight(x - 1, y) * scale;
+		s21 = getHeight(x + 1, y) * scale;
+		s10 = getHeight(x, y - 1) * scale;
+		s12 = getHeight(x, y) * scale;
 
 		vx = { 2.0f, 0, s21 - s01 };
 		vy = { 0, 2.0f, s12 - s10 };
@@ -199,10 +212,10 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 	for (unsigned y = 1; y < width_y - 1; ++y)
 	{
 		// Left edge
-		float s01 = getHeight(0, y);
-		float s21 = getHeight(1, y);
-		float s10 = getHeight(0, y - 1);
-		float s12 = getHeight(0, y + 1);
+		float s01 = getHeight(0, y) * scale;
+		float s21 = getHeight(1, y) * scale;
+		float s10 = getHeight(0, y - 1) * scale;
+		float s12 = getHeight(0, y + 1) * scale;
 
 		Vector3 vx(2.0f, 0, s21 - s01);
 		Vector3 vy(0, 2.0f, s12 - s10);
@@ -214,10 +227,10 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 
 		// Right edge
 		unsigned x = width_x - 1;
-		s01 = getHeight(x - 1, y);
-		s21 = getHeight(x, y);
-		s10 = getHeight(x, y - 1);
-		s12 = getHeight(x, y + 1);
+		s01 = getHeight(x - 1, y) * scale;
+		s21 = getHeight(x, y) * scale;
+		s10 = getHeight(x, y - 1) * scale;
+		s12 = getHeight(x, y + 1) * scale;
 
 		vx = { 2.0f, 0, s21 - s01 };
 		vy = { 0, 2.0f, s12 - s10 };
@@ -233,10 +246,10 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 	// Top left corner
 	unsigned x = 0;
 	unsigned y = 0;
-	float s01 = getHeight(x, y);
-	float s21 = getHeight(x + 1, y);
-	float s10 = getHeight(x, y);
-	float s12 = getHeight(x, y + 1);
+	float s01 = getHeight(x, y) * scale;
+	float s21 = getHeight(x + 1, y) * scale;
+	float s10 = getHeight(x, y) * scale;
+	float s12 = getHeight(x, y + 1) * scale;
 
 	Vector3 vx(2.0f, 0, s21 - s01);
 	Vector3 vy(0, 2.0f, s12 - s10);
@@ -249,10 +262,10 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 	// Top right corner
 	x = width_x - 1;
 	y = 0;
-	s01 = getHeight(x - 1, y);
-	s21 = getHeight(x, y);
-	s10 = getHeight(x, y);
-	s12 = getHeight(x, y + 1);
+	s01 = getHeight(x - 1, y) * scale;
+	s21 = getHeight(x, y) * scale;
+	s10 = getHeight(x, y) * scale;
+	s12 = getHeight(x, y + 1) * scale;
 
 	vx = { 2.0f, 0, s21 - s01 };
 	vy = { 0, 2.0f, s12 - s10 };
@@ -265,10 +278,10 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 	// Bottom left corner
 	x = 0;
 	y = width_y - 1;
-	s01 = getHeight(x, y);
-	s21 = getHeight(x + 1, y);
-	s10 = getHeight(x, y - 1);
-	s12 = getHeight(x, y);
+	s01 = getHeight(x, y) * scale;
+	s21 = getHeight(x + 1, y) * scale;
+	s10 = getHeight(x, y - 1) * scale;
+	s12 = getHeight(x, y) * scale;
 
 	vx = { 2.0f, 0, s21 - s01 };
 	vy = { 0, 2.0f, s12 - s10 };
@@ -281,10 +294,10 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent)
 	// Bottom right corner
 	x = width_x - 1;
 	y = width_y - 1;
-	s01 = getHeight(x - 1, y);
-	s21 = getHeight(x, y);
-	s10 = getHeight(x, y - 1);
-	s12 = getHeight(x, y);
+	s01 = getHeight(x - 1, y) * scale;
+	s21 = getHeight(x, y) * scale;
+	s10 = getHeight(x, y - 1) * scale;
+	s12 = getHeight(x, y) * scale;
 
 	vx = { 2.0f, 0, s21 - s01 };
 	vy = { 0, 2.0f, s12 - s10 };

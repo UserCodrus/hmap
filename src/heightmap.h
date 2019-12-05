@@ -55,7 +55,7 @@ public:
 	void sample(T& noise, float (T::* sample)(float, float) const, float scale = 1.0f);
 
 	// Calculate the normals and tangents for the heightmap
-	void calculateNormals(Vectormap& normal, Vectormap& tangent);
+	void calculateNormals(Vectormap& normal, Vectormap& tangent, float scale = 0.0f);
 
 	// Set the contents of the heightmap to match another heightmap
 	void set(const Heightmap& in);
