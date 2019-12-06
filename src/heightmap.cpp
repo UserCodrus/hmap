@@ -166,7 +166,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 
 			// Get tangents in the x and y directions
 			Vector3 vx(2.0f, 0, s21 - s01);
-			Vector3 vy(0, 2.0f, s12 - s10);
+			Vector3 vy(0, 2.0f, s10 - s12);
 
 			// Calculate the cross product of the two normals
 			vx = normalize(vx);
@@ -186,7 +186,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 		float s12 = getHeight(x, 1) * scale;
 
 		Vector3 vx(2.0f, 0, s21 - s01);
-		Vector3 vy(0, 2.0f, s12 - s10);
+		Vector3 vy(0, 2.0f, s10 - s12);
 
 		vx = normalize(vx);
 		vy = normalize(vy);
@@ -201,7 +201,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 		s12 = getHeight(x, y) * scale;
 
 		vx = { 2.0f, 0, s21 - s01 };
-		vy = { 0, 2.0f, s12 - s10 };
+		vy = { 0, 2.0f, s10 - s12 };
 
 		vx = normalize(vx);
 		vy = normalize(vy);
@@ -218,7 +218,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 		float s12 = getHeight(0, y + 1) * scale;
 
 		Vector3 vx(2.0f, 0, s21 - s01);
-		Vector3 vy(0, 2.0f, s12 - s10);
+		Vector3 vy(0, 2.0f, s10 - s12);
 
 		vx = normalize(vx);
 		vy = normalize(vy);
@@ -233,7 +233,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 		s12 = getHeight(x, y + 1) * scale;
 
 		vx = { 2.0f, 0, s21 - s01 };
-		vy = { 0, 2.0f, s12 - s10 };
+		vy = { 0, 2.0f, s10 - s12 };
 
 		vx = normalize(vx);
 		vy = normalize(vy);
@@ -252,7 +252,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 	float s12 = getHeight(x, y + 1) * scale;
 
 	Vector3 vx(2.0f, 0, s21 - s01);
-	Vector3 vy(0, 2.0f, s12 - s10);
+	Vector3 vy(0, 2.0f, s10 - s12);
 
 	vx = normalize(vx);
 	vy = normalize(vy);
@@ -268,7 +268,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 	s12 = getHeight(x, y + 1) * scale;
 
 	vx = { 2.0f, 0, s21 - s01 };
-	vy = { 0, 2.0f, s12 - s10 };
+	vy = { 0, 2.0f, s10 - s12 };
 
 	vx = normalize(vx);
 	vy = normalize(vy);
@@ -284,7 +284,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 	s12 = getHeight(x, y) * scale;
 
 	vx = { 2.0f, 0, s21 - s01 };
-	vy = { 0, 2.0f, s12 - s10 };
+	vy = { 0, 2.0f, s10 - s12 };
 
 	vx = normalize(vx);
 	vy = normalize(vy);
@@ -300,7 +300,7 @@ void Heightmap::calculateNormals(Vectormap& normal, Vectormap& tangent, float sc
 	s12 = getHeight(x, y) * scale;
 
 	vx = { 2.0f, 0, s21 - s01 };
-	vy = { 0, 2.0f, s12 - s10 };
+	vy = { 0, 2.0f, s10 - s12 };
 
 	vx = normalize(vx);
 	vy = normalize(vy);
