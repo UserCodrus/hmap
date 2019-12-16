@@ -114,18 +114,6 @@ uint32 ComponentBuilder::Run()
 				}
 			}
 
-			// Create UVs
-			/*for (uint16 y = 0; y < component_width; ++y)
-			{
-				for (uint16 x = 0; x < component_width; ++x)
-				{
-					data.UV0.Add(FVector2D(x + map_x, y + map_y));
-				}
-			}*/
-
-			// Create normals and tangents
-			//UKismetProceduralMeshLibrary::CalculateTangentsForMesh(data.vertices, data.triangles, data.UV0, data.normals, data.tangents);
-
 			idle = true;
 		}
 		else
