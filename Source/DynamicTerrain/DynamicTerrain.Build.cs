@@ -51,6 +51,6 @@ public class DynamicTerrain : ModuleRules
 			}
 			);
 
-        Definitions.Add("LOG_TERRAIN_METRICS");
+        PublicDefinitions.Add("LOG_TERRAIN_METRICS");
     }
 }
