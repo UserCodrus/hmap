@@ -5,6 +5,7 @@
 #include "HAL/Runnable.h"
 
 #include "heightmap.h"
+#include "Terrain.h"
 
 struct ComponentData
 {
@@ -21,7 +22,7 @@ struct ComponentData
 class ComponentBuilder : public FRunnable
 {
 public:
-	ComponentBuilder(Heightmap* map, Vectormap* normal, Vectormap* tangent, float map_height, uint16 component_size);
+	ComponentBuilder(const UHeightMap* Map, const TArray<FVector>* Normals, const TArray<FProcMeshTangent>* Tangents, float map_height, int32 component_size);
 	~ComponentBuilder();
 
 	// FRunnable interface
@@ -31,23 +32,23 @@ public:
 
 	// Builder interface
 	bool IsIdle();
-	void Build(uint16 _component_x, uint16 _component_y, uint16 section_number);
+	void Build(int32 _component_x, int32 _component_y, uint16 section_number);
 	ComponentData* GetData();
 
-	FRunnableThread* thread = nullptr;		// The thread this interface runs on
-	FThreadSafeCounter counter;				// Thread counter for managing the thread
-	ComponentData data;						// The container for the data
+	FRunnableThread* thread = nullptr;				// The thread this interface runs on
+	FThreadSafeCounter counter;						// Thread counter for managing the thread
+	ComponentData data;								// The container for the data
 
 private:
-	Heightmap* heightmap;					// The heightmap to draw data from
-	Vectormap* normalmap;					// The vectormap to draw normal data from
-	Vectormap* tangentmap;					// The vectormap to draw tangent data from
+	const UHeightMap* heightmap;					// The heightmap to draw data from
+	const TArray<FVector>* normalmap;				// The vectormap to draw normal data from
+	const TArray<FProcMeshTangent>* tangentmap;		// The vectormap to draw tangent data from
 
-	float total_height;						// The Heigth of the parent terrain
-	uint16 component_width;					// The ComponentSize of the parent terrain
+	float total_height;								// The Heigth of the parent terrain
+	int32 component_width;							// The ComponentSize of the parent terrain
 
-	uint16 component_x;
-	uint16 component_y;
+	int32 component_x;
+	int32 component_y;
 
 	bool idle;
 };

@@ -24,11 +24,11 @@ void ComponentData::allocate(uint16 size, uint16 section_id)
 	tangents.Reserve(size * size);
 }
 
-ComponentBuilder::ComponentBuilder(Heightmap* map, Vectormap* normal, Vectormap* tangent, float map_height, uint16 component_size)
+ComponentBuilder::ComponentBuilder(const UHeightMap* Map, const TArray<FVector>* Normals, const TArray<FProcMeshTangent>* Tangents, float map_height, int32 component_size)
 {
-	heightmap = map;
-	normalmap = normal;
-	tangentmap = tangent;
+	heightmap = Map;
+	normalmap = Normals;
+	tangentmap = Tangents;
 	total_height = map_height;
 	component_width = component_size;
 
@@ -67,32 +67,30 @@ uint32 ComponentBuilder::Run()
 
 			// The number of polygons in each component
 			uint16 polygons = component_width - 1;
-			uint16 heightmap_x = heightmap->getWidthX();
-			uint16 heightmap_y = heightmap->getWidthY();
+			int32 heightmap_x = heightmap->GetWidthX();
+			int32 heightmap_y = heightmap->GetWidthY();
 
 			// The x and y coordinates of the current component in the world
 			float world_x = (float)(heightmap_x - 1) / 2.0f - polygons * component_x;
 			float world_y = (float)(heightmap_y - 1) / 2.0f - polygons * component_y;
 
 			// The x and y coordinates of the current component in the heightmap
-			uint16 map_x = component_x * polygons;
-			uint16 map_y = component_y * polygons;
+			int32 map_x = component_x * polygons;
+			int32 map_y = component_y * polygons;
 
 			// Create vertex data
-			for (uint16 y = 0; y < component_width; ++y)
+			for (int32 y = 0; y < component_width; ++y)
 			{
-				for (uint16 x = 0; x < component_width; ++x)
+				for (int32 x = 0; x < component_width; ++x)
 				{
 					// Vertices
-					data.vertices.Add(FVector(x - world_x, world_y - y, heightmap->getHeight(map_x + x, map_y + y) * total_height));
+					data.vertices.Add(FVector(x - world_x, world_y - y, heightmap->GetHeight(map_x + x, map_y + y) * total_height));
 
 					// Normals
-					Vector3 vec = normalmap->getVector(map_x + x, map_y + y);
-					data.normals.Add(FVector(vec.x, vec.y, vec.z));
+					data.normals.Add((*normalmap)[(map_y + y) * heightmap_x + (map_x + x)]);
 
 					// Tangents
-					vec = tangentmap->getVector(map_x + x, map_y + y);
-					data.tangents.Add(FProcMeshTangent(vec.x, vec.y, vec.z));
+					data.tangents.Add((*tangentmap)[(map_y + y) * heightmap_x + (map_x + x)]);
 
 					// UVs
 					data.UV0.Add(FVector2D(x + map_x, y + map_y));
@@ -100,9 +98,9 @@ uint32 ComponentBuilder::Run()
 			}
 
 			// Create triangles
-			for (uint16 y = 0; y < polygons; ++y)
+			for (int32 y = 0; y < polygons; ++y)
 			{
-				for (uint16 x = 0; x < polygons; ++x)
+				for (int32 x = 0; x < polygons; ++x)
 				{
 					data.triangles.Add(x + (y * component_width));
 					data.triangles.Add(1 + x + y * component_width);
@@ -148,7 +146,7 @@ ComponentData* ComponentBuilder::GetData()
 	}
 }
 
-void ComponentBuilder::Build(uint16 _component_x, uint16 _component_y, uint16 section_number)
+void ComponentBuilder::Build(int32 _component_x, int32 _component_y, uint16 section_number)
 {
 	component_x = _component_x;
 	component_y = _component_y;
