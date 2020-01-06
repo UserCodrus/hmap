@@ -4,7 +4,6 @@
 #include "ProceduralMeshComponent.h"
 #include "HAL/Runnable.h"
 
-#include "heightmap.h"
 #include "Terrain.h"
 
 struct ComponentData
