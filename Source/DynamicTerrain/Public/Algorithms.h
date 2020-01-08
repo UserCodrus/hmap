@@ -16,11 +16,10 @@ inline float curp(float t, float a[4]);
 inline float fade(float t);
 
 // The square of the distance between two vectors in the x and y dimensions
-template <class T>
-float distance2D(const T& a, const T& b)
+float distance2D(const FVector2D& a, const FVector2D& b)
 {
-	float dx = b.x - a.x;
-	float dy = b.y - a.y;
+	float dx = b.X - a.X;
+	float dy = b.Y - a.Y;
 
 	return dx * dx + dy * dy;
 }
