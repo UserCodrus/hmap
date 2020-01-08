@@ -1,4 +1,4 @@
-#include "algorithm.h"
+#include "Algorithms.h"
 
 #include <random>
 #include <stdexcept>
