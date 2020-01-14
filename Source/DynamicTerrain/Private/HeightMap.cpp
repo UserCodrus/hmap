@@ -1,5 +1,7 @@
 #include "HeightMap.h"
 
+/// Blueprint Functions ///
+
 void UHeightMap::Resize(int32 X, int32 Y, int32 Z)
 {
 	if (X <= 0 || Y <= 0 || Z <= 0)
@@ -22,26 +24,6 @@ float UHeightMap::BPGetHeight(int32 X, int32 Y) const
 	}
 
 	return GetHeight(X, Y);
-}
-
-float UHeightMap::GetHeight(uint32 X, uint32 Y) const
-{
-	return MapData[Y * WidthX + X];
-}
-
-void UHeightMap::SetHeight(uint32 X, uint32 Y, float Height)
-{
-	MapData[Y * WidthX + X] = Height;
-}
-
-int32 UHeightMap::GetWidthX() const
-{
-	return WidthX;
-}
-
-int32 UHeightMap::GetWidthY() const
-{
-	return WidthY;
 }
 
 void UHeightMap::CalculateNormalsAndTangents(TArray<FVector>& Normals, TArray<FProcMeshTangent>& Tangents) const
@@ -202,4 +184,26 @@ void UHeightMap::CalculateNormalsAndTangents(TArray<FVector>& Normals, TArray<FP
 	vy.Normalize();
 	Normals[y * WidthX + x] = FVector::CrossProduct(vx, vy);
 	Tangents[y * WidthX + x] = FProcMeshTangent(vx.X, vx.Y, vx.Z);
+}
+
+/// Native Functions ///
+
+float UHeightMap::GetHeight(uint32 X, uint32 Y) const
+{
+	return MapData[Y * WidthX + X];
+}
+
+void UHeightMap::SetHeight(uint32 X, uint32 Y, float Height)
+{
+	MapData[Y * WidthX + X] = Height;
+}
+
+int32 UHeightMap::GetWidthX() const
+{
+	return WidthX;
+}
+
+int32 UHeightMap::GetWidthY() const
+{
+	return WidthY;
 }

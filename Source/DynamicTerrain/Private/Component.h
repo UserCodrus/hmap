@@ -24,12 +24,14 @@ public:
 	ComponentBuilder(const UHeightMap* Map, const TArray<FVector>* Normals, const TArray<FProcMeshTangent>* Tangents, float map_height, int32 component_size);
 	~ComponentBuilder();
 
-	// FRunnable interface
+	/// FRunnable Interface ///
+
 	virtual bool Init() override;
 	virtual uint32 Run() override;
 	virtual void Stop() override;
 
-	// Builder interface
+	/// Builder Interface ///
+
 	bool IsIdle();
 	void Build(int32 _component_x, int32 _component_y, uint16 section_number);
 	ComponentData* GetData();

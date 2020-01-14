@@ -51,6 +51,8 @@ ComponentBuilder::~ComponentBuilder()
 	}
 }
 
+/// FRunnable Interface ///
+
 bool ComponentBuilder::Init()
 {
 	return true;
@@ -128,6 +130,8 @@ void ComponentBuilder::Stop()
 {
 	counter.Increment();
 }
+
+/// Builder Interface ///
 
 bool ComponentBuilder::IsIdle()
 {

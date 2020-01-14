@@ -24,6 +24,7 @@ float distance2D(const FVector2D& a, const FVector2D& b)
 	return dx * dx + dy * dy;
 }
 
+// The base class for noise data
 class Noise
 {
 public:
@@ -85,7 +86,7 @@ protected:
 	float* value = nullptr;
 };
 
-// A value noise grid created using the diamond square algorithm
+// Value noise generated using the diamond square algorithm
 class PlasmaNoise : public ValueNoise
 {
 public:
