@@ -48,3 +48,24 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 		float MaxHeight = 1.0f;
 };
+
+UCLASS(Abstract)
+class UMapGenerator : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	/// Map Generator Functions ///
+
+	// Flatten the heightmap
+	UFUNCTION(BlueprintCallable)
+		static void Flat(UHeightMap* Map);
+
+	// Generate a map using plasma noise
+	UFUNCTION(BlueprintCallable)
+		static void Plasma(UHeightMap* Map, int32 Scale);
+
+	// Generate a map using multiple layers of perlin noise
+	UFUNCTION(BlueprintCallable)
+		static void Perlin(UHeightMap* Map, int32 Frequency, int32 Octaves, float Persistence);
+};
