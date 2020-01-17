@@ -18,11 +18,11 @@ public:
 		void Resize(int32 X, int32 Y, int32 Z);
 
 	// Get the value of the heightmap at the specified coordinates
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 		float BPGetHeight(int32 X, int32 Y) const;
 
 	// Calculate the normals and tangents of the map mesh
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 		void CalculateNormalsAndTangents(TArray<FVector>& Normals, TArray<FProcMeshTangent>& Tangents) const;
 
 	/// Native Functions ///
